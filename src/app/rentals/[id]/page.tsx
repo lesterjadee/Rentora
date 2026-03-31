@@ -125,7 +125,7 @@ export default async function RentalDetailPage({ params }: { params: Promise<{ i
                   type="submit"
                   className="px-6 py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 font-semibold rounded-lg transition"
                 >
-                  Approve
+                  ✅ Approve
                 </button>
               </form>
               <form action={`/api/rentals/${id}/decline`} method="POST">
@@ -133,7 +133,7 @@ export default async function RentalDetailPage({ params }: { params: Promise<{ i
                   type="submit"
                   className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold rounded-lg transition"
                 >
-                  Decline
+                  ❌ Decline
                 </button>
               </form>
             </>
@@ -145,7 +145,7 @@ export default async function RentalDetailPage({ params }: { params: Promise<{ i
                 type="submit"
                 className="px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 font-semibold rounded-lg transition"
               >
-                Mark as Completed
+                ✅ Mark as Completed
               </button>
             </form>
           )}
@@ -160,6 +160,16 @@ export default async function RentalDetailPage({ params }: { params: Promise<{ i
                 Cancel Request
               </button>
             </form>
+          )}
+
+          {/* Review button for completed rentals */}
+          {rental.status === 'completed' && (isOwner || isRenter) && (
+            <Link
+              href={`/reviews/new?rental=${id}`}
+              className="px-6 py-3 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-lg transition"
+            >
+              ⭐ Leave a Review
+            </Link>
           )}
         </div>
       </div>
