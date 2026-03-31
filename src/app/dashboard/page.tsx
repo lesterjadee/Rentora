@@ -65,30 +65,38 @@ export default async function DashboardPage() {
         </div>
 
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Link
             href="/items"
-            className="p-6 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
+            className="p-5 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
           >
             <p className="text-2xl mb-2">🛍️</p>
-            <p className="font-semibold text-white">Browse Items</p>
-            <p className="text-gray-400 text-sm mt-1">Find items to rent</p>
+            <p className="font-semibold text-white text-sm">Browse Items</p>
+            <p className="text-gray-400 text-xs mt-1">Find items to rent</p>
           </Link>
           <Link
             href="/items/new"
-            className="p-6 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
+            className="p-5 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
           >
             <p className="text-2xl mb-2">➕</p>
-            <p className="font-semibold text-white">List an Item</p>
-            <p className="text-gray-400 text-sm mt-1">Rent out your items</p>
+            <p className="font-semibold text-white text-sm">List an Item</p>
+            <p className="text-gray-400 text-xs mt-1">Rent out your items</p>
           </Link>
           <Link
             href="/rentals"
-            className="p-6 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
+            className="p-5 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
           >
             <p className="text-2xl mb-2">📋</p>
-            <p className="font-semibold text-white">My Rentals</p>
-            <p className="text-gray-400 text-sm mt-1">View rental requests</p>
+            <p className="font-semibold text-white text-sm">My Rentals</p>
+            <p className="text-gray-400 text-xs mt-1">View rental requests</p>
+          </Link>
+          <Link
+            href="/recommendations"
+            className="p-5 bg-gray-900 rounded-xl border border-gray-800 hover:border-[#26619C] transition"
+          >
+            <p className="text-2xl mb-2">🎯</p>
+            <p className="font-semibold text-white text-sm">For You</p>
+            <p className="text-gray-400 text-xs mt-1">Recommendations</p>
           </Link>
         </div>
 
