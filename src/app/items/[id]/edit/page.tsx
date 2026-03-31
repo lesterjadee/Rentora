@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-export default function EditItemPage({ params }: { params: { id: string } }) {
+export default function EditItemPage({ params }: { params: any }) {
+const { id } = use(params) as { id: string }
   const router = useRouter()
   const supabase = createClient()
 
@@ -23,10 +24,9 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchData = async () => {
       const [{ data: item }, { data: cats }] = await Promise.all([
-        supabase.from('items').select('*').eq('id', params.id).single(),
+        supabase.from('items').select('*').eq('id', id).single(),
         supabase.from('categories').select('*')
       ])
-
       if (item) {
         setTitle(item.title)
         setDescription(item.description || '')
@@ -39,7 +39,7 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
       if (cats) setCategories(cats)
     }
     fetchData()
-  }, [params.id])
+  }, [id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,7 +58,7 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
         status,
         updated_at: new Date().toISOString()
       })
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       setError(error.message)
@@ -66,14 +66,13 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
       return
     }
 
-    router.push(`/items/${params.id}`)
+    router.push(`/items/${id}`)
     router.refresh()
   }
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this item?')) return
-
-    await supabase.from('items').delete().eq('id', params.id)
+    await supabase.from('items').delete().eq('id', id)
     router.push('/items')
     router.refresh()
   }
@@ -82,7 +81,7 @@ export default function EditItemPage({ params }: { params: { id: string } }) {
     <main className="min-h-screen bg-gray-950 text-white p-8">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <Link href={`/items/${params.id}`} className="text-gray-400 hover:text-white transition">
+          <Link href={`/items/${id}`} className="text-gray-400 hover:text-white transition">
             ← Back
           </Link>
           <h1 className="text-3xl font-bold text-[#26619C]">Edit Item</h1>

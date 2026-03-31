@@ -2,17 +2,14 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
-export default async function ItemPage({ params }: { params: { id: string } }) {
+export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const supabase = await createClient()
 
   const { data: item } = await supabase
     .from('items')
-    .select(`
-      *,
-      profiles(id, full_name, trust_score, university),
-      categories(name, icon)
-    `)
-    .eq('id', params.id)
+    .select(`*, profiles(id, full_name, trust_score), categories(name, icon)`)
+    .eq('id', id)
     .single()
 
   if (!item) notFound()
@@ -28,7 +25,6 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
         </Link>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Image */}
           <div className="bg-gray-900 rounded-xl overflow-hidden border border-gray-800">
             {item.image_url ? (
               <img src={item.image_url} alt={item.title} className="w-full h-80 object-cover" />
@@ -39,7 +35,6 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          {/* Details */}
           <div className="space-y-4">
             <div>
               <span className="text-sm bg-gray-800 text-gray-400 px-2 py-1 rounded-full">
@@ -79,17 +74,14 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
               </div>
             )}
 
-            {/* Action Buttons */}
             <div className="flex gap-3">
               {isOwner ? (
-                <>
-                  <Link
-                    href={`/items/${item.id}/edit`}
-                    className="flex-1 text-center py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-lg transition"
-                  >
-                    Edit Item
-                  </Link>
-                </>
+                <Link
+                  href={`/items/${item.id}/edit`}
+                  className="flex-1 text-center py-3 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-lg transition"
+                >
+                  Edit Item
+                </Link>
               ) : (
                 item.status === 'available' && user && (
                   <Link
