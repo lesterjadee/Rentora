@@ -1,17 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
 export default function RegisterPage() {
-  const router = useRouter()
   const supabase = createClient()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
+  const [studentId, setStudentId] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,18 +21,28 @@ export default function RegisterPage() {
     setError('')
     setMessage('')
 
+    // 🎓 Gordon College email check
+    if (!email.endsWith('@gordoncollege.edu.ph')) {
+      setError('Only Gordon College students can register. Please use your @gordoncollege.edu.ph email.')
+      setLoading(false)
+      return
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName }
+        data: {
+          full_name: fullName,
+          student_id: studentId
+        }
       }
     })
 
     if (error) {
       setError(error.message)
     } else {
-      setMessage('Account created! Please check your email to confirm.')
+      setMessage('Account created! Please check your email to confirm your registration.')
     }
     setLoading(false)
   }
@@ -42,7 +51,13 @@ export default function RegisterPage() {
     <main className="min-h-screen flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-md p-8 bg-gray-900 rounded-2xl shadow-lg">
         <h1 className="text-3xl font-bold text-[#26619C] mb-2">Create account</h1>
-        <p className="text-gray-400 mb-6">Join Rentora today — it's free!</p>
+        <p className="text-gray-400 mb-2">Join Rentora — Gordon College students only!</p>
+
+        <div className="mb-6 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <p className="text-blue-400 text-xs">
+            🎓 Only <strong>@gordoncollege.edu.ph</strong> emails are accepted
+          </p>
+        </div>
 
         {error && (
           <div className="mb-4 p-3 bg-red-500/10 border border-red-500 rounded-lg text-red-400 text-sm">
@@ -64,19 +79,33 @@ export default function RegisterPage() {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              placeholder="Lester Jade"
+              placeholder="Lester Jade Lobos"
               className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
             />
           </div>
 
           <div>
-            <label className="block text-gray-300 text-sm mb-1">Email</label>
+            <label className="block text-gray-300 text-sm mb-1">Student ID</label>
+            <input
+              type="text"
+              value={studentId}
+              onChange={(e) => setStudentId(e.target.value)}
+              required
+              placeholder="202411738"
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-300 text-sm mb-1">
+              Institutional Email
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="you@example.com"
+              placeholder="202411738@gordoncollege.edu.ph"
               className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
             />
           </div>
