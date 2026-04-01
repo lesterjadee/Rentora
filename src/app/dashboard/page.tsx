@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import RealtimeRentals from '@/components/RealtimeRentals'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -26,6 +27,7 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-gray-950 text-white p-8">
+      <RealtimeRentals userId={user.id} />
       <div className="max-w-4xl mx-auto">
 
         {/* Header */}
