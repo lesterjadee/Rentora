@@ -17,9 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} bg-gray-950`}>
+      <body className={`${inter.className} bg-gray-950 min-h-screen`}>
         <Navbar />
-        {children}
+        <div className="animate-fade-in">
+          {children}
+        </div>
       </body>
     </html>
   )

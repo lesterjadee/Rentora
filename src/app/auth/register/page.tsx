@@ -21,7 +21,6 @@ export default function RegisterPage() {
     setError('')
     setMessage('')
 
-    // 🎓 Gordon College email check
     if (!email.endsWith('@gordoncollege.edu.ph')) {
       setError('Only Gordon College students can register. Please use your @gordoncollege.edu.ph email.')
       setLoading(false)
@@ -32,10 +31,7 @@ export default function RegisterPage() {
       email,
       password,
       options: {
-        data: {
-          full_name: fullName,
-          student_id: studentId
-        }
+        data: { full_name: fullName, student_id: studentId }
       }
     })
 
@@ -48,96 +44,106 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-950">
-      <div className="w-full max-w-md p-8 bg-gray-900 rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-bold text-[#26619C] mb-2">Create account</h1>
-        <p className="text-gray-400 mb-2">Join Rentora — Gordon College students only!</p>
+    <main className="min-h-screen flex items-center justify-center bg-gray-950 px-4 py-12">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#26619C]/10 via-transparent to-transparent pointer-events-none" />
 
-        <div className="mb-6 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-          <p className="text-blue-400 text-xs">
-            🎓 Only <strong>@gordoncollege.edu.ph</strong> emails are accepted
-          </p>
+      <div className="w-full max-w-md animate-slide-up">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <Link href="/" className="text-3xl font-bold text-gradient">
+            Rentora
+          </Link>
+          <h1 className="text-2xl font-bold text-white mt-4">Create account</h1>
+          <p className="text-gray-400 mt-2">Join Rentora — Gordon College students only!</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500 rounded-lg text-red-400 text-sm">
-            {error}
-          </div>
-        )}
-
-        {message && (
-          <div className="mb-4 p-3 bg-green-500/10 border border-green-500 rounded-lg text-green-400 text-sm">
-            {message}
-          </div>
-        )}
-
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 text-sm mb-1">Full Name</label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-              placeholder="Lester Jade Lobos"
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
-            />
+        <div className="bg-gray-900 rounded-2xl border border-gray-800 p-8 shadow-xl">
+          {/* Domain Notice */}
+          <div className="mb-5 p-3 bg-[#26619C]/10 border border-[#26619C]/30 rounded-xl flex items-center gap-2">
+            <span>🎓</span>
+            <p className="text-[#26619C] text-sm">
+              Only <strong>@gordoncollege.edu.ph</strong> emails accepted
+            </p>
           </div>
 
-          <div>
-            <label className="block text-gray-300 text-sm mb-1">Student ID</label>
-            <input
-              type="text"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              required
-              placeholder="202411738"
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
-            />
-          </div>
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 rounded-xl text-red-400 text-sm">
+              ❌ {error}
+            </div>
+          )}
 
-          <div>
-            <label className="block text-gray-300 text-sm mb-1">
-              Institutional Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="202411738@gordoncollege.edu.ph"
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
-            />
-          </div>
+          {message && (
+            <div className="mb-4 p-3 bg-green-500/10 border border-green-500/50 rounded-xl text-green-400 text-sm">
+              ✅ {message}
+            </div>
+          )}
 
-          <div>
-            <label className="block text-gray-300 text-sm mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-              minLength={6}
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:border-[#26619C]"
-            />
-          </div>
+          <form onSubmit={handleRegister} className="space-y-4">
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">Full Name</label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+                placeholder="Lester Jade Lobos"
+                className="w-full px-4 py-3 bg-gray-800 text-white rounded-xl border border-gray-700 focus:outline-none focus:border-[#26619C] focus:ring-1 focus:ring-[#26619C]/50 transition-all"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? 'Creating account...' : 'Create Account'}
-          </button>
-        </form>
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">Student ID</label>
+              <input
+                type="text"
+                value={studentId}
+                onChange={(e) => setStudentId(e.target.value)}
+                required
+                placeholder="202411738"
+                className="w-full px-4 py-3 bg-gray-800 text-white rounded-xl border border-gray-700 focus:outline-none focus:border-[#26619C] focus:ring-1 focus:ring-[#26619C]/50 transition-all"
+              />
+            </div>
 
-        <p className="mt-6 text-center text-gray-400 text-sm">
-          Already have an account?{' '}
-          <Link href="/auth/login" className="text-[#26619C] hover:underline">
-            Sign in
-          </Link>
-        </p>
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">Institutional Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                placeholder="202411738@gordoncollege.edu.ph"
+                className="w-full px-4 py-3 bg-gray-800 text-white rounded-xl border border-gray-700 focus:outline-none focus:border-[#26619C] focus:ring-1 focus:ring-[#26619C]/50 transition-all"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+                minLength={6}
+                className="w-full px-4 py-3 bg-gray-800 text-white rounded-xl border border-gray-700 focus:outline-none focus:border-[#26619C] focus:ring-1 focus:ring-[#26619C]/50 transition-all"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#26619C]/25 disabled:opacity-50 mt-2"
+            >
+              {loading ? 'Creating account...' : 'Create Account →'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-gray-400 text-sm">
+            Already have an account?{' '}
+            <Link href="/auth/login" className="text-[#26619C] hover:text-[#4a9edd] font-medium transition-colors">
+              Sign in
+            </Link>
+          </p>
+        </div>
       </div>
     </main>
   )
