@@ -5,152 +5,147 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   const { id } = await params
   const supabase = await createClient()
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', id)
-    .single()
-
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', id).single()
   const { data: reviews } = await supabase
     .from('reviews')
-    .select(`
-      *,
-      reviewer:profiles!reviews_reviewer_id_fkey(full_name)
-    `)
-    .eq('reviewee_id', id)
-    .order('created_at', { ascending: false })
-
+    .select(`*, reviewer:profiles!reviews_reviewer_id_fkey(full_name)`)
+    .eq('reviewee_id', id).order('created_at', { ascending: false })
   const { data: items } = await supabase
-    .from('items')
-    .select('*')
-    .eq('owner_id', id)
-    .eq('status', 'available')
+    .from('items').select('*').eq('owner_id', id).eq('status', 'available')
 
   if (!profile) return (
-    <main className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-      <p className="text-gray-400">Profile not found</p>
-    </main>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: '#94a3b8' }}>Profile not found</p>
+    </div>
   )
 
-  const trustPercentage = profile.trust_score
-    ? Math.round(profile.trust_score * 100)
-    : 0
-
-  const getTrustColor = (score: number) => {
-    if (score >= 80) return 'text-green-400'
-    if (score >= 60) return 'text-yellow-400'
-    if (score >= 40) return 'text-orange-400'
-    return 'text-red-400'
-  }
-
-  const getTrustLabel = (score: number) => {
-    if (score >= 80) return 'Highly Trusted'
-    if (score >= 60) return 'Trusted'
-    if (score >= 40) return 'Moderate'
-    return 'New Member'
-  }
+  const trustScore = profile.trust_score || 0
+  const trustConfig = trustScore >= 4
+    ? { color: '#16a34a', bg: '#f0fdf4', border: '#86efac', label: 'Highly Trusted' }
+    : trustScore >= 3
+    ? { color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', label: 'Trusted' }
+    : trustScore >= 2
+    ? { color: '#d97706', bg: '#fffbeb', border: '#fde68a', label: 'Building Trust' }
+    : { color: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', label: 'New Member' }
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <Link href="/items" className="text-gray-400 hover:text-white transition mb-6 inline-block">
-          ← Back
-        </Link>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
 
-        {/* Profile Header */}
-        <div className="bg-gray-900 p-6 rounded-2xl border border-gray-800 mb-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="w-16 h-16 bg-[#26619C] rounded-full flex items-center justify-center text-2xl font-bold mb-3">
-                {profile.full_name?.charAt(0).toUpperCase()}
-              </div>
-              <h1 className="text-2xl font-bold text-white">{profile.full_name}</h1>
-              <p className="text-gray-400 text-sm mt-1">{profile.university || 'Gordon College'}</p>
-              <p className="text-gray-500 text-xs mt-1">
-                Member since {new Date(profile.created_at).toLocaleDateString()}
-              </p>
-            </div>
-
-            {/* Trust Score */}
-            <div className="text-right">
-              <p className="text-gray-400 text-xs mb-1">TRUST SCORE</p>
-              <p className={`text-4xl font-bold ${getTrustColor(trustPercentage)}`}>
-                {trustPercentage}%
-              </p>
-              <p className={`text-sm ${getTrustColor(trustPercentage)}`}>
-                {getTrustLabel(trustPercentage)}
-              </p>
-              <p className="text-gray-500 text-xs mt-1">
-                Based on {profile.total_reviews || 0} reviews
-              </p>
-            </div>
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #26619C 100%)', padding: '60px 24px 100px' }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto', textAlign: 'center' }}>
+          <div style={{
+            width: '80px', height: '80px',
+            background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
+            borderRadius: '24px', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', color: '#ffffff', fontWeight: '800',
+            fontSize: '32px', margin: '0 auto 16px',
+            boxShadow: '0 8px 24px rgba(59,130,246,0.4)'
+          }}>
+            {profile.full_name?.charAt(0).toUpperCase()}
           </div>
+          <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#ffffff', margin: '0 0 8px', letterSpacing: '-0.02em' }}>{profile.full_name}</h1>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', margin: '0 0 16px' }}>Gordon College · Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            fontSize: '14px', fontWeight: '700',
+            backgroundColor: trustConfig.bg, color: trustConfig.color,
+            border: `1px solid ${trustConfig.border}`,
+            padding: '8px 20px', borderRadius: '999px'
+          }}>
+            <span>★</span> {trustScore} · {trustConfig.label}
+          </span>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1000px', margin: '-60px auto 0', padding: '0 24px 48px' }}>
+
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+          {[
+            { label: 'Trust Score', value: trustScore || '--', color: '#d97706' },
+            { label: 'Total Reviews', value: profile.total_reviews || 0, color: '#26619C' },
+            { label: 'Items Listed', value: items?.length || 0, color: '#7c3aed' },
+          ].map((stat, i) => (
+            <div key={i} style={{
+              backgroundColor: '#ffffff', borderRadius: '16px',
+              border: '1px solid #e8edf2', padding: '24px', textAlign: 'center',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.06)'
+            }}>
+              <p style={{ fontSize: '36px', fontWeight: '800', color: stat.color, margin: '0 0 6px' }}>{stat.value}</p>
+              <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0, fontWeight: '600' }}>{stat.label}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Reviews Section */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+
+          {/* Reviews */}
           <div>
-            <h2 className="text-xl font-bold text-white mb-4">
-              ⭐ Reviews ({reviews?.length || 0})
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <div style={{ width: '4px', height: '20px', backgroundColor: '#d97706', borderRadius: '999px' }} />
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: 0 }}>Reviews ({reviews?.length || 0})</h2>
+            </div>
             {reviews && reviews.length > 0 ? (
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {reviews.map((review: any) => (
-                  <div key={review.id} className="bg-gray-900 p-4 rounded-xl border border-gray-800">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-white text-sm font-semibold">
-                        {review.reviewer?.full_name}
-                      </p>
-                      <div className="flex">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <span key={star} className="text-sm">
-                            {star <= review.rating ? '⭐' : '☆'}
-                          </span>
+                  <div key={review.id} style={{
+                    backgroundColor: '#ffffff', borderRadius: '14px',
+                    border: '1px solid #e8edf2', padding: '16px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <p style={{ fontWeight: '700', fontSize: '14px', color: '#0f172a', margin: 0 }}>{review.reviewer?.full_name}</p>
+                      <div style={{ display: 'flex', gap: '2px' }}>
+                        {[1,2,3,4,5].map(s => (
+                          <span key={s} style={{ fontSize: '13px', filter: s <= review.rating ? 'none' : 'grayscale(1) opacity(0.3)' }}>⭐</span>
                         ))}
                       </div>
                     </div>
-                    {review.comment && (
-                      <p className="text-gray-400 text-sm">{review.comment}</p>
-                    )}
-                    <p className="text-gray-600 text-xs mt-2">
-                      {new Date(review.created_at).toLocaleDateString()}
-                    </p>
+                    {review.comment && <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 6px', lineHeight: '1.6' }}>{review.comment}</p>}
+                    <p style={{ fontSize: '11px', color: '#94a3b8', margin: 0 }}>{new Date(review.created_at).toLocaleDateString()}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 text-center">
-                <p className="text-gray-400">No reviews yet</p>
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e8edf2', padding: '40px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', marginBottom: '8px' }}>⭐</p>
+                <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>No reviews yet</p>
               </div>
             )}
           </div>
 
-          {/* Listed Items */}
+          {/* Items */}
           <div>
-            <h2 className="text-xl font-bold text-white mb-4">
-              📦 Listed Items ({items?.length || 0})
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <div style={{ width: '4px', height: '20px', backgroundColor: '#26619C', borderRadius: '999px' }} />
+              <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: 0 }}>Listed Items ({items?.length || 0})</h2>
+            </div>
             {items && items.length > 0 ? (
-              <div className="space-y-3">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {items.map((item: any) => (
-                  <Link key={item.id} href={`/items/${item.id}`}>
-                    <div className="bg-gray-900 p-4 rounded-xl border border-gray-800 hover:border-[#26619C] transition">
-                      <p className="font-semibold text-white">{item.title}</p>
-                      <p className="text-[#26619C] font-bold text-sm mt-1">
-                        ₱{item.price_per_day}/day
-                      </p>
+                  <Link key={item.id} href={`/items/${item.id}`} style={{ textDecoration: 'none' }}>
+                    <div style={{
+                      backgroundColor: '#ffffff', borderRadius: '14px',
+                      border: '1px solid #e8edf2', padding: '16px 20px',
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                    }}>
+                      <p style={{ fontWeight: '600', fontSize: '14px', color: '#0f172a', margin: 0 }}>{item.title}</p>
+                      <span style={{ fontSize: '15px', fontWeight: '800', color: '#26619C' }}>₱{item.price_per_day}<span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '400' }}>/day</span></span>
                     </div>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="bg-gray-900 p-6 rounded-xl border border-gray-800 text-center">
-                <p className="text-gray-400">No items listed</p>
+              <div style={{ backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e8edf2', padding: '40px', textAlign: 'center' }}>
+                <p style={{ fontSize: '28px', marginBottom: '8px' }}>📦</p>
+                <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>No items listed</p>
               </div>
             )}
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

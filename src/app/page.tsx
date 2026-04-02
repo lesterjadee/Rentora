@@ -6,177 +6,412 @@ export default async function Home() {
   const { data: { user } } = await supabase.auth.getUser()
 
   const { count: itemCount } = await supabase
-    .from('items')
-    .select('*', { count: 'exact', head: true })
-    .eq('status', 'available')
-
+    .from('items').select('*', { count: 'exact', head: true }).eq('status', 'available')
   const { count: userCount } = await supabase
-    .from('profiles')
-    .select('*', { count: 'exact', head: true })
-
+    .from('profiles').select('*', { count: 'exact', head: true })
   const { count: rentalCount } = await supabase
-    .from('rentals')
-    .select('*', { count: 'exact', head: true })
+    .from('rentals').select('*', { count: 'exact', head: true })
+
+  const features = [
+    { icon: '🔐', title: 'Verified Students Only', desc: 'Restricted to @gordoncollege.edu.ph emails. Every person is a verified member of your campus.' },
+    { icon: '⭐', title: 'Trust Score System', desc: 'Every completed rental generates a rating. Build your reputation over time.' },
+    { icon: '🎯', title: 'Smart Recommendations', desc: 'Rentora surfaces items most relevant to you based on your activity.' },
+    { icon: '🔔', title: 'Real-time Notifications', desc: 'Instant alerts the moment your rental is approved, declined, or completed.' },
+    { icon: '📷', title: 'Photo Listings', desc: 'Upload clear photos so renters know exactly what they are getting.' },
+    { icon: '📅', title: 'Conflict-free Booking', desc: 'Automatic date validation prevents double bookings every time.' },
+  ]
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white">
+    <div style={{ fontFamily: 'system-ui, sans-serif', backgroundColor: '#ffffff', color: '#111827' }}>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#26619C]/20 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute top-20 left-10 w-72 h-72 bg-[#26619C]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#26619C]/5 rounded-full blur-3xl pointer-events-none" />
+      {/* HERO */}
+      <section style={{ borderBottom: '1px solid #f3f4f6', padding: '80px 24px 100px' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
 
-        <div className="relative max-w-6xl mx-auto px-6 py-24 text-center animate-fade-in">
-          <div className="inline-flex items-center gap-2 bg-[#26619C]/10 border border-[#26619C]/30 rounded-full px-4 py-2 mb-6">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span className="text-sm text-gray-300">Gordon College Student Platform</span>
-          </div>
+            {/* Left */}
+            <div>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                border: '1px solid #dbeafe', backgroundColor: '#eff6ff',
+                borderRadius: '999px', padding: '6px 16px', marginBottom: '32px'
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#22c55e', display: 'inline-block' }} />
+                <span style={{ fontSize: '12px', fontWeight: '600', color: '#26619C', letterSpacing: '0.05em' }}>
+                  Gordon College · Campus Rental Platform
+                </span>
+              </div>
 
-          <h1 className="text-6xl md:text-7xl font-bold mb-6">
-            <span className="text-gradient">Rentora</span>
-          </h1>
+              <h1 style={{ fontSize: '56px', fontWeight: '800', lineHeight: '1.1', letterSpacing: '-0.02em', marginBottom: '24px', color: '#0f172a' }}>
+                Rent smarter.<br />
+                <span style={{ color: '#26619C' }}>Save more.</span>
+              </h1>
 
-          <p className="text-xl md:text-2xl text-gray-400 mb-4 max-w-2xl mx-auto">
-            The smart way to rent and lend academic items
-          </p>
+              <p style={{ fontSize: '18px', color: '#6b7280', lineHeight: '1.7', marginBottom: '40px', maxWidth: '460px' }}>
+                Rentora connects Gordon College students to rent, lend, and manage academic items — from calculators to lab equipment — all within a trusted campus network.
+              </p>
 
-          <p className="text-gray-500 mb-10 max-w-xl mx-auto">
-            Connect with fellow Gordon College students to rent calculators, books, lab equipment and more — all in one trusted platform.
-          </p>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '56px' }}>
+                {user ? (
+                  <>
+                    <Link href="/items" style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '8px',
+                      padding: '14px 28px', backgroundColor: '#26619C', color: '#ffffff',
+                      fontWeight: '600', borderRadius: '12px', textDecoration: 'none',
+                      fontSize: '15px', transition: 'background 0.2s'
+                    }}>
+                      Browse Items →
+                    </Link>
+                    <Link href="/items/new" style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '8px',
+                      padding: '14px 28px', backgroundColor: '#ffffff', color: '#374151',
+                      fontWeight: '600', borderRadius: '12px', textDecoration: 'none',
+                      fontSize: '15px', border: '1px solid #e5e7eb'
+                    }}>
+                      List an Item
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/register" style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '8px',
+                      padding: '14px 28px', backgroundColor: '#26619C', color: '#ffffff',
+                      fontWeight: '600', borderRadius: '12px', textDecoration: 'none', fontSize: '15px'
+                    }}>
+                      Get started free →
+                    </Link>
+                    <Link href="/auth/login" style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      padding: '14px 28px', backgroundColor: '#ffffff', color: '#374151',
+                      fontWeight: '600', borderRadius: '12px', textDecoration: 'none',
+                      fontSize: '15px', border: '1px solid #e5e7eb'
+                    }}>
+                      Sign in
+                    </Link>
+                  </>
+                )}
+              </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            {user ? (
-              <Link
-                href="/dashboard"
-                className="px-8 py-4 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#26619C]/25 hover:-translate-y-0.5"
-              >
-                Go to Dashboard →
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/auth/register"
-                  className="px-8 py-4 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#26619C]/25 hover:-translate-y-0.5"
-                >
-                  Get Started Free
-                </Link>
-                <Link
-                  href="/auth/login"
-                  className="px-8 py-4 bg-gray-800 hover:bg-gray-700 text-white font-semibold rounded-xl transition-all duration-200 border border-gray-700 hover:border-[#26619C]"
-                >
-                  Sign In
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-lg mx-auto">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-[#26619C]">{itemCount || 0}</p>
-              <p className="text-gray-500 text-sm mt-1">Items Available</p>
+              {/* Stats */}
+              <div style={{ display: 'flex', gap: '32px', paddingTop: '32px', borderTop: '1px solid #f3f4f6' }}>
+                {[
+                  { value: itemCount ?? 0, label: 'Items available' },
+                  { value: userCount ?? 0, label: 'Students enrolled' },
+                  { value: rentalCount ?? 0, label: 'Rentals completed' },
+                ].map((stat, i) => (
+                  <div key={i}>
+                    {i > 0 && <div style={{ width: '1px', height: '40px', backgroundColor: '#e5e7eb', float: 'left', marginRight: '32px' }} />}
+                    <p style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: 0 }}>{stat.value}</p>
+                    <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-[#26619C]">{userCount || 0}</p>
-              <p className="text-gray-500 text-sm mt-1">Students</p>
+
+            {/* Right — Item Card */}
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: '340px' }}>
+
+                {/* Shadow card behind */}
+                <div style={{
+                  position: 'absolute', top: '12px', left: '12px', right: '-12px', bottom: '-12px',
+                  backgroundColor: '#eff6ff', borderRadius: '20px', border: '1px solid #dbeafe'
+                }} />
+
+                {/* Main card */}
+                <div style={{
+                  position: 'relative', backgroundColor: '#ffffff', borderRadius: '20px',
+                  border: '1px solid #e5e7eb', padding: '24px',
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.06)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      Featured Item
+                    </span>
+                    <span style={{
+                      fontSize: '11px', fontWeight: '700', color: '#15803d',
+                      backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0',
+                      borderRadius: '999px', padding: '4px 12px'
+                    }}>
+                      Available
+                    </span>
+                  </div>
+
+                  <div style={{
+                    backgroundColor: '#f8fafc', borderRadius: '14px', height: '180px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: '20px', border: '1px solid #f1f5f9', fontSize: '64px'
+                  }}>
+                    🔬
+                  </div>
+
+                  <h3 style={{ fontWeight: '700', fontSize: '16px', color: '#0f172a', margin: '0 0 4px' }}>
+                    Scientific Calculator
+                  </h3>
+                  <p style={{ fontSize: '13px', color: '#9ca3af', margin: '0 0 16px' }}>
+                    Casio fx-991EX · Like New
+                  </p>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontSize: '22px', fontWeight: '800', color: '#26619C' }}>₱50</span>
+                      <span style={{ fontSize: '13px', color: '#9ca3af' }}>/day</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ color: '#f59e0b', fontSize: '14px' }}>★</span>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: '#374151' }}>4.9</span>
+                      <span style={{ fontSize: '13px', color: '#9ca3af' }}>(12)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating notification */}
+                <div style={{
+                  position: 'absolute', bottom: '-20px', right: '-20px',
+                  backgroundColor: '#ffffff', border: '1px solid #e5e7eb',
+                  borderRadius: '14px', padding: '12px 16px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                  display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10
+                }}>
+                  <div style={{
+                    width: '32px', height: '32px', backgroundColor: '#f0fdf4',
+                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px'
+                  }}>✅</div>
+                  <div>
+                    <p style={{ fontSize: '12px', fontWeight: '700', color: '#0f172a', margin: 0 }}>Rental Approved!</p>
+                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>Just now</p>
+                  </div>
+                </div>
+
+              </div>
             </div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-[#26619C]">{rentalCount || 0}</p>
-              <p className="text-gray-500 text-sm mt-1">Rentals Made</p>
-            </div>
+
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-bold text-center text-white mb-4">
-          Everything you need to rent smarter
-        </h2>
-        <p className="text-gray-400 text-center mb-12 max-w-xl mx-auto">
-          Built specifically for Gordon College students with safety and trust in mind.
-        </p>
+      {/* FEATURES */}
+      <section style={{ padding: '96px 24px', borderBottom: '1px solid #f3f4f6' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ marginBottom: '64px' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#26619C', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
+              Why Rentora
+            </p>
+            <h2 style={{ fontSize: '40px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: '1.2', marginBottom: '16px' }}>
+              Everything you need.<br />Nothing you don't.
+            </h2>
+            <p style={{ fontSize: '18px', color: '#6b7280', maxWidth: '480px', lineHeight: '1.7' }}>
+              Built specifically for Gordon College students with safety and trust in mind.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              icon: '🔐',
-              title: 'Verified Students Only',
-              desc: 'Only @gordoncollege.edu.ph emails allowed. Your community stays safe.'
-            },
-            {
-              icon: '⭐',
-              title: 'Trust Score System',
-              desc: 'Rate your experience after every rental. Build your reputation on campus.'
-            },
-            {
-              icon: '🎯',
-              title: 'Smart Recommendations',
-              desc: 'Get personalized item suggestions based on your rental history.'
-            },
-            {
-              icon: '🔔',
-              title: 'Real-time Notifications',
-              desc: 'Get instant updates when your rental is approved, declined or completed.'
-            },
-            {
-              icon: '📷',
-              title: 'Photo Listings',
-              desc: 'Upload photos of your items so renters know exactly what they\'re getting.'
-            },
-            {
-              icon: '📅',
-              title: 'Smart Booking',
-              desc: 'Automatic date validation prevents double bookings and conflicts.'
-            }
-          ].map((feature, i) => (
-            <div
-              key={i}
-              className="p-6 bg-gray-900 rounded-2xl border border-gray-800 hover:border-[#26619C]/50 transition-all duration-200 card-hover"
-            >
-              <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="font-bold text-white text-lg mb-2">{feature.title}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">{feature.desc}</p>
-            </div>
-          ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
+            {features.map((f, i) => (
+              <div key={i} style={{
+                padding: '28px', backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb', borderRadius: '16px',
+                transition: 'all 0.2s'
+              }}>
+                <div style={{
+                  width: '44px', height: '44px', backgroundColor: '#eff6ff',
+                  borderRadius: '12px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontSize: '22px', marginBottom: '20px'
+                }}>
+                  {f.icon}
+                </div>
+                <h3 style={{ fontWeight: '700', fontSize: '16px', color: '#0f172a', marginBottom: '8px' }}>{f.title}</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="max-w-6xl mx-auto px-6 py-20">
-        <div className="bg-gradient-to-br from-[#26619C]/20 to-gray-900 rounded-3xl border border-[#26619C]/20 p-12 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to start renting?
+      {/* HOW IT WORKS */}
+      <section style={{ padding: '96px 24px', backgroundColor: '#fafafa', borderBottom: '1px solid #f3f4f6' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: '11px', fontWeight: '700', color: '#26619C', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
+            How it works
+          </p>
+          <h2 style={{ fontSize: '40px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '16px' }}>
+            Up and running in minutes
           </h2>
-          <p className="text-gray-400 mb-8 max-w-md mx-auto">
-            Join your fellow Gordon College students on Rentora today.
+          <p style={{ fontSize: '18px', color: '#6b7280', marginBottom: '64px' }}>
+            Three simple steps stand between you and the item you need.
           </p>
-          {!user && (
-            <Link
-              href="/auth/register"
-              className="inline-block px-8 py-4 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#26619C]/25 hover:-translate-y-0.5"
-            >
-              Create Your Account →
-            </Link>
-          )}
-          {user && (
-            <Link
-              href="/items"
-              className="inline-block px-8 py-4 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-[#26619C]/25 hover:-translate-y-0.5"
-            >
-              Browse Items →
-            </Link>
-          )}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+            {[
+              { n: '01', title: 'Create your account', desc: 'Sign up with your Gordon College institutional email. Verification is automatic.' },
+              { n: '02', title: 'Browse or list items', desc: 'Find what you need or list your own items to earn while helping others.' },
+              { n: '03', title: 'Rent with confidence', desc: 'Request a rental, agree on dates, and transact safely within a trusted network.' },
+            ].map((step, i) => (
+              <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{
+                  width: '64px', height: '64px', backgroundColor: '#ffffff',
+                  border: '2px solid #dbeafe', borderRadius: '16px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  margin: '0 auto 24px', fontSize: '20px', fontWeight: '800', color: '#26619C'
+                }}>
+                  {step.n}
+                </div>
+                <h3 style={{ fontWeight: '700', fontSize: '18px', color: '#0f172a', marginBottom: '12px' }}>{step.title}</h3>
+                <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.7', maxWidth: '280px', margin: '0 auto' }}>{step.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-800 px-6 py-8 text-center text-gray-500 text-sm">
-        <p>© 2026 Rentora — Built for Gordon College Students</p>
-        <p className="mt-2 text-gray-600">Made with ❤️ by Lester Jade Lobos</p>
+      {/* TRUST SECTION */}
+      <section style={{ padding: '96px 24px', borderBottom: '1px solid #f3f4f6' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+          <div>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#26619C', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>
+              Trust & Safety
+            </p>
+            <h2 style={{ fontSize: '40px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', lineHeight: '1.2', marginBottom: '24px' }}>
+              Your reputation matters.<br />We make it visible.
+            </h2>
+            <p style={{ fontSize: '18px', color: '#6b7280', lineHeight: '1.7', marginBottom: '40px' }}>
+              Every rental you complete builds your Trust Score — a transparent rating visible to the entire community. High scores unlock faster approvals and better deals.
+            </p>
+            {[
+              { label: 'Identity verified', desc: 'Institutional email required for all accounts' },
+              { label: 'Ratings after every rental', desc: 'Both parties rate each other after completion' },
+              { label: 'Transparent trust scores', desc: 'Visible on every user profile' },
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                <div style={{
+                  width: '20px', height: '20px', borderRadius: '50%',
+                  backgroundColor: '#eff6ff', border: '2px solid #bfdbfe',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, marginTop: '2px'
+                }}>
+                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#26619C' }} />
+                </div>
+                <div>
+                  <p style={{ fontWeight: '600', fontSize: '14px', color: '#1f2937', margin: '0 0 2px' }}>{item.label}</p>
+                  <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Trust card */}
+          <div>
+            <div style={{
+              backgroundColor: '#ffffff', border: '1px solid #e5e7eb',
+              borderRadius: '20px', padding: '32px',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.06)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                <div style={{
+                  width: '52px', height: '52px', backgroundColor: '#26619C',
+                  borderRadius: '14px', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', color: '#ffffff', fontWeight: '800', fontSize: '20px'
+                }}>L</div>
+                <div>
+                  <p style={{ fontWeight: '700', fontSize: '16px', color: '#0f172a', margin: 0 }}>Lester Jade Lobos</p>
+                  <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>Gordon College · 2024</p>
+                </div>
+              </div>
+
+              <div style={{
+                backgroundColor: '#f8fafc', borderRadius: '14px',
+                padding: '20px', marginBottom: '20px', border: '1px solid #f1f5f9'
+              }}>
+                <p style={{ fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Trust Score</p>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '42px', fontWeight: '800', color: '#26619C', lineHeight: 1 }}>4.8</span>
+                  <span style={{ fontSize: '16px', color: '#9ca3af', marginBottom: '4px' }}>/ 5.0</span>
+                </div>
+                <div style={{ display: 'flex', gap: '4px' }}>
+                  {[1,2,3,4,5].map(s => (
+                    <div key={s} style={{
+                      height: '6px', flex: 1, borderRadius: '999px',
+                      backgroundColor: s <= 4 ? '#26619C' : '#dbeafe'
+                    }} />
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                {[{ l: 'Rentals', v: '12' }, { l: 'Reviews', v: '10' }, { l: 'Items', v: '3' }].map((s, i) => (
+                  <div key={i} style={{
+                    textAlign: 'center', padding: '16px 8px',
+                    backgroundColor: '#f8fafc', borderRadius: '12px', border: '1px solid #f1f5f9'
+                  }}>
+                    <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0 }}>{s.v}</p>
+                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: '4px 0 0' }}>{s.l}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section style={{ padding: '96px 24px' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{
+            backgroundColor: '#26619C', borderRadius: '24px',
+            padding: '80px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden'
+          }}>
+            <h2 style={{ fontSize: '40px', fontWeight: '800', color: '#ffffff', letterSpacing: '-0.02em', marginBottom: '16px', lineHeight: '1.2' }}>
+              Your campus marketplace<br />is waiting.
+            </h2>
+            <p style={{ fontSize: '18px', color: '#bfdbfe', marginBottom: '40px', maxWidth: '420px', margin: '0 auto 40px', lineHeight: '1.6' }}>
+              Join Gordon College students already using Rentora to save money and share resources.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {user ? (
+                <Link href="/items" style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  padding: '16px 32px', backgroundColor: '#ffffff', color: '#26619C',
+                  fontWeight: '700', borderRadius: '12px', textDecoration: 'none', fontSize: '15px'
+                }}>
+                  Browse items now →
+                </Link>
+              ) : (
+                <>
+                  <Link href="/auth/register" style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '8px',
+                    padding: '16px 32px', backgroundColor: '#ffffff', color: '#26619C',
+                    fontWeight: '700', borderRadius: '12px', textDecoration: 'none', fontSize: '15px'
+                  }}>
+                    Create free account →
+                  </Link>
+                  <Link href="/auth/login" style={{
+                    display: 'inline-flex', alignItems: 'center',
+                    padding: '16px 32px', backgroundColor: 'transparent',
+                    border: '1.5px solid rgba(255,255,255,0.3)', color: '#ffffff',
+                    fontWeight: '600', borderRadius: '12px', textDecoration: 'none', fontSize: '15px'
+                  }}>
+                    Sign in
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={{ borderTop: '1px solid #f3f4f6', padding: '40px 24px' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '18px', fontWeight: '800', color: '#26619C' }}>Rentora</span>
+            <span style={{ color: '#e5e7eb' }}>|</span>
+            <span style={{ fontSize: '14px', color: '#9ca3af' }}>Student Item Rental Hub</span>
+          </div>
+          <p style={{ fontSize: '13px', color: '#9ca3af', margin: 0 }}>
+            © 2026 Rentora · Built for Gordon College · By Lester Jade Lobos
+          </p>
+        </div>
       </footer>
 
-    </main>
+    </div>
   )
 }

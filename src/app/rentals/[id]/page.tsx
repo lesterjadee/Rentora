@@ -6,7 +6,6 @@ export default async function RentalDetailPage({ params }: { params: Promise<{ i
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) redirect('/auth/login')
 
   const { data: rental } = await supabase
@@ -25,154 +24,195 @@ export default async function RentalDetailPage({ params }: { params: Promise<{ i
   const isOwner = user.id === rental.owner_id
   const isRenter = user.id === rental.renter_id
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30'
-      case 'approved': return 'text-blue-400 bg-blue-400/10 border-blue-400/30'
-      case 'active': return 'text-green-400 bg-green-400/10 border-green-400/30'
-      case 'completed': return 'text-gray-400 bg-gray-400/10 border-gray-400/30'
-      case 'declined': return 'text-red-400 bg-red-400/10 border-red-400/30'
-      default: return 'text-gray-400 bg-gray-400/10 border-gray-400/30'
-    }
+  const statusConfig: any = {
+    pending:   { bg: '#fffbeb', color: '#d97706', border: '#fde68a', label: 'Pending Review', icon: '⏳' },
+    approved:  { bg: '#eff6ff', color: '#2563eb', border: '#bfdbfe', label: 'Approved', icon: '✅' },
+    active:    { bg: '#f0fdf4', color: '#16a34a', border: '#86efac', label: 'Active', icon: '🟢' },
+    completed: { bg: '#f8fafc', color: '#64748b', border: '#e2e8f0', label: 'Completed', icon: '🏁' },
+    declined:  { bg: '#fef2f2', color: '#dc2626', border: '#fecaca', label: 'Declined', icon: '❌' },
+    cancelled: { bg: '#fef2f2', color: '#dc2626', border: '#fecaca', label: 'Cancelled', icon: '🚫' },
   }
 
+  const s = statusConfig[rental.status] || statusConfig.pending
+
   return (
-    <main className="min-h-screen bg-gray-950 text-white p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/rentals" className="text-gray-400 hover:text-white transition">
-            ← Back to Rentals
-          </Link>
-          <h1 className="text-3xl font-bold text-[#26619C]">Rental Details</h1>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+
+      {/* Header */}
+      <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #26619C 100%)', padding: '40px 24px' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <Link href="/rentals" style={{
+            width: '38px', height: '38px', backgroundColor: 'rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#ffffff', textDecoration: 'none', fontSize: '18px'
+          }}>←</Link>
+          <div>
+            <p style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>Rental Details</p>
+            <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff', margin: 0 }}>{rental.items?.title}</h1>
+          </div>
         </div>
+      </div>
+
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 24px' }}>
 
         {/* Status Banner */}
-        <div className={`p-4 rounded-xl border mb-6 ${getStatusColor(rental.status)}`}>
-          <p className="font-semibold capitalize text-lg">Status: {rental.status}</p>
-          {rental.status === 'pending' && isOwner && (
-            <p className="text-sm opacity-80 mt-1">Review and respond to this rental request</p>
-          )}
-          {rental.status === 'pending' && isRenter && (
-            <p className="text-sm opacity-80 mt-1">Waiting for the owner to respond</p>
-          )}
+        <div style={{
+          backgroundColor: s.bg, border: `1px solid ${s.border}`,
+          borderRadius: '16px', padding: '20px 24px', marginBottom: '24px',
+          display: 'flex', alignItems: 'center', gap: '12px'
+        }}>
+          <span style={{ fontSize: '24px' }}>{s.icon}</span>
+          <div>
+            <p style={{ fontWeight: '700', fontSize: '16px', color: s.color, margin: '0 0 4px' }}>
+              Status: {s.label}
+            </p>
+            <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>
+              {rental.status === 'pending' && isOwner && 'Review this request and approve or decline it.'}
+              {rental.status === 'pending' && isRenter && 'Waiting for the owner to respond to your request.'}
+              {rental.status === 'approved' && 'This rental has been approved and is ready to proceed.'}
+              {rental.status === 'completed' && 'This rental has been completed successfully.'}
+            </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+
           {/* Item Info */}
-          <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
-            <p className="text-gray-400 text-xs mb-2">ITEM</p>
-            <p className="font-semibold text-white text-lg">{rental.items?.title}</p>
-            <p className="text-[#26619C] font-bold mt-1">₱{rental.items?.price_per_day}/day</p>
-            <p className="text-gray-400 text-sm mt-1 capitalize">
-              Condition: {rental.items?.condition?.replace('_', ' ')}
-            </p>
-            <Link
-              href={`/items/${rental.items?.id}`}
-              className="text-[#26619C] text-sm hover:underline mt-2 inline-block"
-            >
-              View Item →
-            </Link>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e8edf2', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Item</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ width: '52px', height: '52px', backgroundColor: '#eff6ff', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px' }}>📦</div>
+              <div>
+                <p style={{ fontWeight: '700', fontSize: '16px', color: '#0f172a', margin: '0 0 4px' }}>{rental.items?.title}</p>
+                <p style={{ fontSize: '22px', fontWeight: '800', color: '#26619C', margin: 0 }}>₱{rental.items?.price_per_day}<span style={{ fontSize: '13px', color: '#94a3b8', fontWeight: '400' }}>/day</span></p>
+              </div>
+            </div>
+            <Link href={`/items/${rental.items?.id}`} style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              fontSize: '13px', fontWeight: '600', color: '#26619C',
+              textDecoration: 'none', padding: '8px 14px',
+              backgroundColor: '#eff6ff', borderRadius: '8px'
+            }}>View Item →</Link>
           </div>
 
-          {/* Rental Info */}
-          <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
-            <p className="text-gray-400 text-xs mb-2">RENTAL PERIOD</p>
-            <p className="text-white font-semibold">{rental.start_date}</p>
-            <p className="text-gray-400 text-sm">to</p>
-            <p className="text-white font-semibold">{rental.end_date}</p>
-            <div className="mt-3 pt-3 border-t border-gray-700">
-              <p className="text-gray-400 text-xs">Total Price</p>
-              <p className="text-2xl font-bold text-[#26619C]">₱{rental.total_price}</p>
+          {/* Rental Period */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e8edf2', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Rental Period</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div>
+                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 4px' }}>From</p>
+                <p style={{ fontWeight: '700', fontSize: '18px', color: '#0f172a', margin: 0 }}>{rental.start_date}</p>
+              </div>
+              <span style={{ fontSize: '20px', color: '#94a3b8' }}>→</span>
+              <div>
+                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 4px' }}>To</p>
+                <p style={{ fontWeight: '700', fontSize: '18px', color: '#0f172a', margin: 0 }}>{rental.end_date}</p>
+              </div>
+            </div>
+            <div style={{ backgroundColor: '#f8fafc', borderRadius: '12px', padding: '14px', border: '1px solid #f1f5f9' }}>
+              <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 4px' }}>Total Price</p>
+              <p style={{ fontSize: '28px', fontWeight: '800', color: '#26619C', margin: 0 }}>₱{rental.total_price}</p>
             </div>
           </div>
 
-          {/* Renter Info */}
-          <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
-            <p className="text-gray-400 text-xs mb-2">RENTER</p>
-            <p className="text-white font-semibold">{rental.renter?.full_name}</p>
-            <p className="text-gray-400 text-sm">{rental.renter?.email}</p>
-            <p className="text-gray-500 text-xs mt-1">
-              Trust Score: {rental.renter?.trust_score || 'N/A'}
-            </p>
+          {/* Renter */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e8edf2', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Renter</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #0891b2, #06b6d4)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '800', fontSize: '18px' }}>
+                {rental.renter?.full_name?.charAt(0)}
+              </div>
+              <div>
+                <p style={{ fontWeight: '700', fontSize: '15px', color: '#0f172a', margin: '0 0 3px' }}>{rental.renter?.full_name}</p>
+                <p style={{ fontSize: '13px', color: '#94a3b8', margin: '0 0 3px' }}>{rental.renter?.email}</p>
+                {rental.renter?.trust_score > 0 && (
+                  <p style={{ fontSize: '12px', color: '#d97706', margin: 0, fontWeight: '700' }}>★ Trust Score: {rental.renter.trust_score}</p>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Owner Info */}
-          <div className="bg-gray-900 p-5 rounded-xl border border-gray-800">
-            <p className="text-gray-400 text-xs mb-2">OWNER</p>
-            <p className="text-white font-semibold">{rental.owner?.full_name}</p>
-            <p className="text-gray-400 text-sm">{rental.owner?.email}</p>
-            <p className="text-gray-500 text-xs mt-1">
-              Trust Score: {rental.owner?.trust_score || 'N/A'}
-            </p>
+          {/* Owner */}
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e8edf2', padding: '24px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Owner</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '44px', height: '44px', background: 'linear-gradient(135deg, #1a3a5c, #26619C)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: '800', fontSize: '18px' }}>
+                {rental.owner?.full_name?.charAt(0)}
+              </div>
+              <div>
+                <p style={{ fontWeight: '700', fontSize: '15px', color: '#0f172a', margin: '0 0 3px' }}>{rental.owner?.full_name}</p>
+                <p style={{ fontSize: '13px', color: '#94a3b8', margin: '0 0 3px' }}>{rental.owner?.email}</p>
+                {rental.owner?.trust_score > 0 && (
+                  <p style={{ fontSize: '12px', color: '#d97706', margin: 0, fontWeight: '700' }}>★ Trust Score: {rental.owner.trust_score}</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Message */}
         {rental.message && (
-          <div className="bg-gray-900 p-5 rounded-xl border border-gray-800 mb-6">
-            <p className="text-gray-400 text-xs mb-2">MESSAGE FROM RENTER</p>
-            <p className="text-gray-300">{rental.message}</p>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e8edf2', padding: '24px', marginBottom: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <p style={{ fontSize: '11px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px' }}>Message from Renter</p>
+            <p style={{ fontSize: '15px', color: '#374151', lineHeight: '1.7', margin: 0, fontStyle: 'italic' }}>"{rental.message}"</p>
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-3 flex-wrap">
-          {/* Owner actions */}
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           {isOwner && rental.status === 'pending' && (
             <>
               <form action={`/api/rentals/${id}/approve`} method="POST">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/30 font-semibold rounded-lg transition"
-                >
-                  ✅ Approve
-                </button>
+                <button type="submit" style={{
+                  padding: '14px 28px', background: 'linear-gradient(135deg, #059669, #10b981)',
+                  color: '#ffffff', fontWeight: '700', borderRadius: '12px',
+                  border: 'none', fontSize: '15px', cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(16,185,129,0.3)'
+                }}>✅ Approve Request</button>
               </form>
               <form action={`/api/rentals/${id}/decline`} method="POST">
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold rounded-lg transition"
-                >
-                  ❌ Decline
-                </button>
+                <button type="submit" style={{
+                  padding: '14px 28px', backgroundColor: '#fef2f2',
+                  color: '#dc2626', fontWeight: '700', borderRadius: '12px',
+                  border: '1px solid #fecaca', fontSize: '15px', cursor: 'pointer'
+                }}>❌ Decline</button>
               </form>
             </>
           )}
 
           {isOwner && rental.status === 'approved' && (
             <form action={`/api/rentals/${id}/complete`} method="POST">
-              <button
-                type="submit"
-                className="px-6 py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 font-semibold rounded-lg transition"
-              >
-                ✅ Mark as Completed
-              </button>
+              <button type="submit" style={{
+                padding: '14px 28px', background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
+                color: '#ffffff', fontWeight: '700', borderRadius: '12px',
+                border: 'none', fontSize: '15px', cursor: 'pointer',
+                boxShadow: '0 4px 16px rgba(26,58,92,0.3)'
+              }}>🏁 Mark as Completed</button>
             </form>
           )}
 
-          {/* Renter actions */}
           {isRenter && rental.status === 'pending' && (
             <form action={`/api/rentals/${id}/cancel`} method="POST">
-              <button
-                type="submit"
-                className="px-6 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-semibold rounded-lg transition"
-              >
-                Cancel Request
-              </button>
+              <button type="submit" style={{
+                padding: '14px 28px', backgroundColor: '#fef2f2',
+                color: '#dc2626', fontWeight: '700', borderRadius: '12px',
+                border: '1px solid #fecaca', fontSize: '15px', cursor: 'pointer'
+              }}>🚫 Cancel Request</button>
             </form>
           )}
 
-          {/* Review button for completed rentals */}
           {rental.status === 'completed' && (isOwner || isRenter) && (
-            <Link
-              href={`/reviews/new?rental=${id}`}
-              className="px-6 py-3 bg-[#26619C] hover:bg-[#1e4f82] text-white font-semibold rounded-lg transition"
-            >
-              ⭐ Leave a Review
-            </Link>
+            <Link href={`/reviews/new?rental=${id}`} style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '14px 28px', background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+              color: '#ffffff', fontWeight: '700', borderRadius: '12px',
+              textDecoration: 'none', fontSize: '15px',
+              boxShadow: '0 4px 16px rgba(217,119,6,0.3)'
+            }}>⭐ Leave a Review</Link>
           )}
         </div>
       </div>
-    </main>
+    </div>
   )
 }
