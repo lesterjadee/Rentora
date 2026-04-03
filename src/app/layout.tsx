@@ -7,7 +7,13 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Rentora — Student Item Rental Hub',
-  description: 'Rent, lend, and manage academic items with your fellow students at Gordon College',
+  description: 'Rent, lend, and manage academic items with fellow Gordon College students',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Rentora',
+  },
 }
 
 export default function RootLayout({
@@ -17,6 +23,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#1a3a5c" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Rentora" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body className={inter.className}>
         <Navbar />
         <div className="animate-fade-in">
