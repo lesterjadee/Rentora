@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [studentId, setStudentId] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -47,6 +48,7 @@ export default function RegisterPage() {
         .register-left { width: 40%; background: linear-gradient(160deg, #1a3a5c 0%, #0f2744 40%, #26619C 100%); padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
         .register-right { flex: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 48px; }
         .register-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 18px; padding: 0; display: flex; align-items: center; }
         @media (max-width: 768px) {
           .register-left { display: none; }
           .register-right { padding: 32px 24px; }
@@ -55,6 +57,7 @@ export default function RegisterPage() {
       `}</style>
 
       <div className="register-container">
+        {/* Left Panel */}
         <div className="register-left">
           <div style={{ position: 'relative' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
@@ -81,6 +84,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
+        {/* Right Panel */}
         <div className="register-right">
           <div style={{ width: '100%', maxWidth: '420px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
@@ -95,25 +99,55 @@ export default function RegisterPage() {
             {message && <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', color: '#15803d', fontSize: '13px' }}>✅ {message}</div>}
 
             <form onSubmit={handleRegister}>
+              {/* Full Name + Student ID */}
               <div className="register-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Full Name</label>
-                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Lester Jade" style={inputStyle} />
+                  <input
+                    type="text" value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required placeholder="Full Name"
+                    style={inputStyle}
+                  />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Student ID</label>
-                  <input type="text" value={studentId} onChange={(e) => setStudentId(e.target.value)} required placeholder="202411738" style={inputStyle} />
+                  <input
+                    type="text" value={studentId}
+                    onChange={(e) => setStudentId(e.target.value)}
+                    required placeholder="Student ID"
+                    style={inputStyle}
+                  />
                 </div>
               </div>
 
+              {/* Email */}
               <div style={{ marginBottom: '12px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Institutional Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="202411738@gordoncollege.edu.ph" style={inputStyle} />
+                <input
+                  type="email" value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required placeholder="@gordoncollege.edu.ph"
+                  style={inputStyle}
+                />
               </div>
 
+              {/* Password with show/hide */}
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Password</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Min. 6 characters" minLength={6} style={inputStyle} />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required placeholder="Min. 6 characters"
+                    minLength={6}
+                    style={{ ...inputStyle, paddingRight: '48px' }}
+                  />
+                  <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
               </div>
 
               <button type="submit" disabled={loading} style={{

@@ -10,6 +10,7 @@ export default function LoginPage() {
   const supabase = createClient()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -29,6 +30,7 @@ export default function LoginPage() {
         .login-left { width: 45%; background: linear-gradient(160deg, #1a3a5c 0%, #0f2744 40%, #26619C 100%); padding: 60px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
         .login-right { flex: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 48px; }
         .login-features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 18px; padding: 0; display: flex; align-items: center; }
         @media (max-width: 768px) {
           .login-left { display: none; }
           .login-right { padding: 32px 24px; }
@@ -36,9 +38,9 @@ export default function LoginPage() {
       `}</style>
 
       <div className="login-container">
+        {/* Left Panel */}
         <div className="login-left">
           <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.2), transparent)' }} />
-
           <div style={{ position: 'relative' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '60px' }}>
@@ -53,7 +55,6 @@ export default function LoginPage() {
               Connect with verified Gordon College students to rent and lend academic items safely.
             </p>
           </div>
-
           <div className="login-features">
             {[
               { icon: '🔐', text: 'Verified students only' },
@@ -69,6 +70,7 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* Right Panel */}
         <div className="login-right">
           <div style={{ width: '100%', maxWidth: '400px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
@@ -86,25 +88,37 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleLogin}>
+              {/* Email */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Institutional Email</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  Institutional Email
+                </label>
                 <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                  placeholder="202411738@gordoncollege.edu.ph"
+                  type="email" value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required placeholder="@gordoncollege.edu.ph"
                   style={{ width: '100%', padding: '14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
                 />
               </div>
 
+              {/* Password with show/hide */}
               <div style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Password</label>
                   <Link href="/auth/forgot-password" style={{ fontSize: '13px', fontWeight: '600', color: '#26619C', textDecoration: 'none' }}>Forgot password?</Link>
                 </div>
-                <input
-                  type="password" value={password} onChange={(e) => setPassword(e.target.value)} required
-                  placeholder="••••••••"
-                  style={{ width: '100%', padding: '14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
-                />
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required placeholder="Enter your password"
+                    style={{ width: '100%', padding: '14px 48px 14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
+                  />
+                  <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
+                </div>
               </div>
 
               <button type="submit" disabled={loading} style={{
