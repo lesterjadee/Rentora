@@ -90,10 +90,10 @@ export default function ItemsPage() {
                       {item.image_url ? (
                         <img src={item.image_url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <span style={{ fontSize: '44px' }}>📦</span>
+                        <span style={{ fontSize: '44px' }}>{item.categories?.icon || '📦'}</span>
                       )}
                       <span style={{ position: 'absolute', top: '10px', left: '10px', backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: '8px', padding: '3px 8px', fontSize: '11px', fontWeight: '600', color: '#374151' }}>
-                        {item.categories?.icon} {item.categories?.name}
+                        {item.categories?.name}
                       </span>
                     </div>
                     <div style={{ padding: '14px' }}>

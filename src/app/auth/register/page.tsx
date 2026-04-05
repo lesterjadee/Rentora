@@ -4,6 +4,20 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
+const EyeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+)
+
+const EyeOffIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+)
+
 export default function RegisterPage() {
   const supabase = createClient()
   const [email, setEmail] = useState('')
@@ -48,7 +62,8 @@ export default function RegisterPage() {
         .register-left { width: 40%; background: linear-gradient(160deg, #1a3a5c 0%, #0f2744 40%, #26619C 100%); padding: 60px; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
         .register-right { flex: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 48px; }
         .register-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 18px; padding: 0; display: flex; align-items: center; }
+        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; padding: 0; display: flex; align-items: center; justify-content: center; }
+        .pw-toggle:hover { color: #64748b; }
         @media (max-width: 768px) {
           .register-left { display: none; }
           .register-right { padding: 32px 24px; }
@@ -57,7 +72,6 @@ export default function RegisterPage() {
       `}</style>
 
       <div className="register-container">
-        {/* Left Panel */}
         <div className="register-left">
           <div style={{ position: 'relative' }}>
             <Link href="/" style={{ textDecoration: 'none' }}>
@@ -84,7 +98,6 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Right Panel */}
         <div className="register-right">
           <div style={{ width: '100%', maxWidth: '420px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
@@ -99,40 +112,22 @@ export default function RegisterPage() {
             {message && <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', color: '#15803d', fontSize: '13px' }}>✅ {message}</div>}
 
             <form onSubmit={handleRegister}>
-              {/* Full Name + Student ID */}
               <div className="register-grid" style={{ marginBottom: '12px' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Full Name</label>
-                  <input
-                    type="text" value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required placeholder="Full Name"
-                    style={inputStyle}
-                  />
+                  <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Full Name" style={inputStyle} />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Student ID</label>
-                  <input
-                    type="text" value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                    required placeholder="Student ID"
-                    style={inputStyle}
-                  />
+                  <input type="text" value={studentId} onChange={(e) => setStudentId(e.target.value)} required placeholder="Student ID" style={inputStyle} />
                 </div>
               </div>
 
-              {/* Email */}
               <div style={{ marginBottom: '12px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Institutional Email</label>
-                <input
-                  type="email" value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required placeholder="@gordoncollege.edu.ph"
-                  style={inputStyle}
-                />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="@gordoncollege.edu.ph" style={inputStyle} />
               </div>
 
-              {/* Password with show/hide */}
               <div style={{ marginBottom: '24px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Password</label>
                 <div style={{ position: 'relative' }}>
@@ -145,7 +140,7 @@ export default function RegisterPage() {
                     style={{ ...inputStyle, paddingRight: '48px' }}
                   />
                   <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
               </div>

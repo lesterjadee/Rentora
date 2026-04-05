@@ -9,7 +9,7 @@ export default async function RentalsPage() {
 
   const { data: myRentals } = await supabase
     .from('rentals')
-    .select(`*, items(title, image_url, price_per_day), profiles!rentals_owner_id_fkey(full_name)`)
+    .select(`*, items(title, image_url, price_per_day, categories(name, icon)), profiles!rentals_owner_id_fkey(full_name)`)
     .eq('renter_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -37,7 +37,9 @@ export default async function RentalsPage() {
       <Link href={`/rentals/${rental.id}`} style={{ textDecoration: 'none', display: 'block', marginBottom: '10px' }}>
         <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', border: '1px solid #e8edf2', padding: '16px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', gap: '12px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0, flex: 1 }}>
-            <div style={{ width: '44px', height: '44px', backgroundColor: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>📦</div>
+            <div style={{ width: '44px', height: '44px', backgroundColor: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', flexShrink: 0 }}>
+            {rental.items?.categories?.icon || '📦'}
+            </div>
             <div style={{ minWidth: 0 }}>
               <p style={{ fontWeight: '700', fontSize: '14px', color: '#0f172a', margin: '0 0 3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{rental.items?.title}</p>
               <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 3px' }}>{rental.start_date} → {rental.end_date}</p>

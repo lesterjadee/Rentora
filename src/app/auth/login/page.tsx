@@ -5,6 +5,20 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
+const EyeIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+)
+
+const EyeOffIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+)
+
 export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
@@ -30,7 +44,8 @@ export default function LoginPage() {
         .login-left { width: 45%; background: linear-gradient(160deg, #1a3a5c 0%, #0f2744 40%, #26619C 100%); padding: 60px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
         .login-right { flex: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 48px; }
         .login-features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; font-size: 18px; padding: 0; display: flex; align-items: center; }
+        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; padding: 0; display: flex; align-items: center; justify-content: center; }
+        .pw-toggle:hover { color: #64748b; }
         @media (max-width: 768px) {
           .login-left { display: none; }
           .login-right { padding: 32px 24px; }
@@ -38,7 +53,6 @@ export default function LoginPage() {
       `}</style>
 
       <div className="login-container">
-        {/* Left Panel */}
         <div className="login-left">
           <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.2), transparent)' }} />
           <div style={{ position: 'relative' }}>
@@ -70,7 +84,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Right Panel */}
         <div className="login-right">
           <div style={{ width: '100%', maxWidth: '400px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
@@ -101,12 +114,11 @@ export default function LoginPage() {
                 />
               </div>
 
-              {/* Password with show/hide */}
+              {/* Password */}
               <div style={{ marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#374151' }}>Password</label>
-                  <Link href="/auth/forgot-password" style={{ fontSize: '13px', fontWeight: '600', color: '#26619C', textDecoration: 'none' }}>Forgot password?</Link>
-                </div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  Password
+                </label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showPassword ? 'text' : 'password'}
@@ -116,26 +128,37 @@ export default function LoginPage() {
                     style={{ width: '100%', padding: '14px 48px 14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
                   />
                   <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? '🙈' : '👁️'}
+                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                   </button>
                 </div>
               </div>
 
+              {/* Sign In Button */}
               <button type="submit" disabled={loading} style={{
                 width: '100%', padding: '14px',
                 background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1a3a5c, #26619C)',
                 color: '#ffffff', fontWeight: '700', borderRadius: '12px',
                 border: 'none', fontSize: '15px', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 16px rgba(26,58,92,0.3)'
+                boxShadow: '0 4px 16px rgba(26,58,92,0.3)', marginBottom: '16px'
               }}>
                 {loading ? 'Signing in...' : 'Sign In →'}
               </button>
-            </form>
 
-            <p style={{ marginTop: '24px', textAlign: 'center', fontSize: '14px', color: '#64748b' }}>
-              Don't have an account?{' '}
-              <Link href="/auth/register" style={{ color: '#26619C', fontWeight: '700', textDecoration: 'none' }}>Register here</Link>
-            </p>
+              {/* Forgot Password — below Sign In */}
+              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                <Link href="/auth/forgot-password" style={{ fontSize: '14px', fontWeight: '600', color: '#26619C', textDecoration: 'none' }}>
+                  Forgot password?
+                </Link>
+              </div>
+
+              {/* Register link — below Forgot password */}
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: '14px', color: '#64748b' }}>Don't have an account? </span>
+                <Link href="/auth/register" style={{ fontSize: '14px', fontWeight: '700', color: '#26619C', textDecoration: 'none' }}>
+                  Register here
+                </Link>
+              </div>
+            </form>
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
 
-  const { data: myItems } = await supabase.from('items').select('*').eq('owner_id', user.id)
+  const { data: myItems } = await supabase.from('items').select('*, categories(name, icon)').eq('owner_id', user.id)
   const { data: myRentals } = await supabase.from('rentals').select('*').eq('renter_id', user.id)
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
 
@@ -100,7 +100,9 @@ export default async function DashboardPage() {
                   <Link key={item.id} href={`/items/${item.id}`} style={{ textDecoration: 'none' }}>
                     <div style={{ borderRadius: '14px', border: '1px solid #f1f5f9', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fafbfc' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <div style={{ width: '42px', height: '42px', backgroundColor: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>📦</div>
+                        <div style={{ width: '42px', height: '42px', backgroundColor: '#eff6ff', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 }}>
+                        {item.categories?.icon || '📦'}
+                        </div>
                         <div>
                           <p style={{ fontWeight: '600', fontSize: '15px', color: '#0f172a', margin: '0 0 3px' }}>{item.title}</p>
                           <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>₱{item.price_per_day}/day</p>
