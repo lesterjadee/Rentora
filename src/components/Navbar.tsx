@@ -101,10 +101,16 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                <Link href="/dashboard" style={{ textDecoration: 'none' }}>
-                  <div style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg, #1a3a5c, #26619C)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontWeight: '700', fontSize: '15px' }}>
-                    {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
+                <Link href={user ? `/profile/${user.id}` : '/dashboard'} style={{ textDecoration: 'none' }}>
+                <div style={{
+                width: '38px', height: '38px',
+                background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
+                borderRadius: '10px', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', color: '#ffffff',
+                fontWeight: '700', fontSize: '15px'
+                }}>
+                {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
+                </div>
                 </Link>
 
                 {/* Mobile Menu Button */}
