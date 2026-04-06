@@ -174,19 +174,80 @@ export default function NewItemPage() {
             </div>
 
             {/* Price Preview */}
-            {pricePerDay && parseFloat(pricePerDay) > 0 && (
-              <div style={{ background: 'linear-gradient(135deg, #1a3a5c, #26619C)', borderRadius: '16px', padding: '20px', boxShadow: '0 4px 16px rgba(26,58,92,0.25)' }}>
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)', margin: '0 0 10px', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Price Preview</p>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                  {[1, 3, 7].map(days => (
-                    <div key={days} style={{ textAlign: 'center' }}>
-                      <p style={{ fontSize: '20px', fontWeight: '800', color: '#ffffff', margin: '0 0 2px' }}>₱{(parseFloat(pricePerDay) * days).toFixed(0)}</p>
-                      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>{days}d</p>
+            <div style={{
+              background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
+              borderRadius: '16px',
+              padding: '24px',
+              boxShadow: '0 4px 16px rgba(26,58,92,0.25)',
+              transition: 'all 0.3s'
+            }}>
+              <p style={{
+                fontSize: '11px',
+                color: 'rgba(255,255,255,0.5)',
+                margin: '0 0 16px',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em'
+              }}>
+                Price Preview
+              </p>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gap: '12px'
+              }}>
+                {[
+                  { days: 1, label: '1 day' },
+                  { days: 3, label: '3 days' },
+                  { days: 7, label: '7 days' },
+                ].map(({ days, label }) => {
+                  const price = pricePerDay && parseFloat(pricePerDay) > 0
+                    ? (parseFloat(pricePerDay) * days).toFixed(0)
+                    : '--';
+
+                  return (
+                    <div key={days} style={{
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      border: '1px solid rgba(255,255,255,0.15)',
+                      borderRadius: '12px',
+                      padding: '14px',
+                      textAlign: 'center'
+                    }}>
+                      <p style={{
+                        fontSize: '22px',
+                        fontWeight: '800',
+                        color: '#ffffff',
+                        margin: '0 0 4px',
+                        lineHeight: 1
+                      }}>
+                        {price !== '--' ? `₱${price}` : '--'}
+                      </p>
+
+                      <p style={{
+                        fontSize: '11px',
+                        color: 'rgba(255,255,255,0.5)',
+                        margin: 0,
+                        fontWeight: '600'
+                      }}>
+                        {label}
+                      </p>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
-            )}
+
+              {(!pricePerDay || parseFloat(pricePerDay) <= 0) && (
+                <p style={{
+                  fontSize: '12px',
+                  color: 'rgba(255,255,255,0.4)',
+                  margin: '12px 0 0',
+                  textAlign: 'center'
+                }}>
+                  Enter a price above to see the preview
+                </p>
+              )}
+            </div>
 
             <button type="submit" disabled={loading} style={{
               width: '100%', padding: '16px',
