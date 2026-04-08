@@ -34,8 +34,8 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
     setMessage('')
-    if (!email.endsWith('@gordoncollege.edu.ph')) {
-      setError('Only Gordon College students can register. Please use your @gordoncollege.edu.ph email.')
+    if (!email.endsWith('.edu.ph')) {
+      setError('Only students with a valid institutional email (.edu.ph) can register.')
       setLoading(false)
       return
     }
@@ -84,14 +84,14 @@ export default function RegisterPage() {
               Join your campus<br />rental community.
             </h2>
             <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.7', marginBottom: '40px' }}>
-              Exclusive to Gordon College students. Verify with your institutional email.
+              Open to all college students. Verify with your institutional .edu.ph email.
             </p>
             <div style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '16px', padding: '20px', display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
               <span style={{ fontSize: '24px' }}>🎓</span>
               <div>
-                <p style={{ fontWeight: '700', color: '#ffffff', margin: '0 0 4px', fontSize: '14px' }}>Gordon College Only</p>
+                <p style={{ fontWeight: '700', color: '#ffffff', margin: '0 0 4px', fontSize: '14px' }}>Students Only</p>
                 <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
-                  Only <strong style={{ color: '#60a5fa' }}>@gordoncollege.edu.ph</strong> emails accepted.
+                  Any valid <strong style={{ color: '#60a5fa' }}>.edu.ph</strong> institutional email is accepted.
                 </p>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function RegisterPage() {
             </div>
 
             <h1 style={{ fontSize: '30px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '8px' }}>Create your account</h1>
-            <p style={{ fontSize: '15px', color: '#64748b', marginBottom: '32px' }}>Free forever for Gordon College students</p>
+            <p style={{ fontSize: '15px', color: '#64748b', marginBottom: '32px' }}>Free for all college students</p>
 
             {error && <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', color: '#dc2626', fontSize: '13px' }}>❌ {error}</div>}
             {message && <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', color: '#15803d', fontSize: '13px' }}>✅ {message}</div>}
@@ -125,7 +125,7 @@ export default function RegisterPage() {
 
               <div style={{ marginBottom: '12px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Institutional Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="@gordoncollege.edu.ph" style={inputStyle} />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="yourname@school.edu.ph" style={inputStyle} />
               </div>
 
               <div style={{ marginBottom: '24px' }}>
@@ -133,10 +133,8 @@ export default function RegisterPage() {
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required placeholder="Min. 6 characters"
-                    minLength={6}
+                    value={password} onChange={(e) => setPassword(e.target.value)}
+                    required placeholder="Min. 6 characters" minLength={6}
                     style={{ ...inputStyle, paddingRight: '48px' }}
                   />
                   <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>

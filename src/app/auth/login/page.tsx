@@ -66,7 +66,7 @@ export default function LoginPage() {
               The smarter way<br />to rent on campus.
             </h2>
             <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.7', maxWidth: '340px' }}>
-              Connect with verified Gordon College students to rent and lend academic items safely.
+              Connect with verified students to rent and lend academic items safely within your campus network.
             </p>
           </div>
           <div className="login-features">
@@ -101,30 +101,22 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleLogin}>
-              {/* Email */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                  Institutional Email
-                </label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Institutional Email</label>
                 <input
-                  type="email" value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required placeholder="@gordoncollege.edu.ph"
+                  type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
+                  placeholder="yourname@school.edu.ph"
                   style={{ width: '100%', padding: '14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
                 />
               </div>
 
-              {/* Password */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
-                  Password
-                </label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Password</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required placeholder="Enter your password"
+                    value={password} onChange={(e) => setPassword(e.target.value)} required
+                    placeholder="Enter your password"
                     style={{ width: '100%', padding: '14px 48px 14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
                   />
                   <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
@@ -133,7 +125,6 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* Sign In Button */}
               <button type="submit" disabled={loading} style={{
                 width: '100%', padding: '14px',
                 background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1a3a5c, #26619C)',
@@ -144,14 +135,12 @@ export default function LoginPage() {
                 {loading ? 'Signing in...' : 'Sign In →'}
               </button>
 
-              {/* Forgot Password — below Sign In */}
               <div style={{ textAlign: 'center', marginBottom: '12px' }}>
                 <Link href="/auth/forgot-password" style={{ fontSize: '14px', fontWeight: '600', color: '#26619C', textDecoration: 'none' }}>
                   Forgot password?
                 </Link>
               </div>
 
-              {/* Register link — below Forgot password */}
               <div style={{ textAlign: 'center' }}>
                 <span style={{ fontSize: '14px', color: '#64748b' }}>Don't have an account? </span>
                 <Link href="/auth/register" style={{ fontSize: '14px', fontWeight: '700', color: '#26619C', textDecoration: 'none' }}>
