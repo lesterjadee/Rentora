@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { ArrowLeft, Camera, Sparkles, Star, ThumbsUp, Wrench, ImagePlus } from 'lucide-react'
 
 export default function NewItemPage() {
   const router = useRouter()
@@ -72,10 +73,10 @@ export default function NewItemPage() {
   }
 
   const conditionOptions = [
-    { value: 'new', label: '✨ New', color: '#16a34a' },
-    { value: 'like_new', label: '👌 Like New', color: '#2563eb' },
-    { value: 'good', label: '👍 Good', color: '#d97706' },
-    { value: 'fair', label: '🔧 Fair', color: '#ea580c' },
+    { value: 'new',      label: 'New',      icon: <Sparkles size={16} color="#16a34a" strokeWidth={2} />,  activeColor: '#16a34a', activeBg: '#f0fdf4', activeBorder: '#86efac' },
+    { value: 'like_new', label: 'Like New', icon: <Star size={16} color="#2563eb" strokeWidth={2} />,      activeColor: '#2563eb', activeBg: '#eff6ff', activeBorder: '#bfdbfe' },
+    { value: 'good',     label: 'Good',     icon: <ThumbsUp size={16} color="#d97706" strokeWidth={2} />,  activeColor: '#d97706', activeBg: '#fffbeb', activeBorder: '#fde68a' },
+    { value: 'fair',     label: 'Fair',     icon: <Wrench size={16} color="#ea580c" strokeWidth={2} />,    activeColor: '#ea580c', activeBg: '#fff7ed', activeBorder: '#fed7aa' },
   ]
 
   return (
@@ -91,11 +92,20 @@ export default function NewItemPage() {
       `}</style>
 
       <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
+
+        {/* Banner */}
         <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #26619C 100%)', padding: '40px 24px' }}>
           <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Link href="/items" style={{ width: '38px', height: '38px', backgroundColor: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', textDecoration: 'none', fontSize: '18px', flexShrink: 0 }}>←</Link>
+            <Link href="/items" style={{
+              width: '38px', height: '38px', backgroundColor: 'rgba(255,255,255,0.15)',
+              border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#ffffff', textDecoration: 'none', flexShrink: 0
+            }}>
+              <ArrowLeft size={18} strokeWidth={2} />
+            </Link>
             <div>
-              <p style={{ fontSize: '13px', fontWeight: '600', color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>Marketplace</p>
+              <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>Marketplace</p>
               <h1 style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: '800', color: '#ffffff', margin: 0 }}>List an Item</h1>
             </div>
           </div>
@@ -103,7 +113,9 @@ export default function NewItemPage() {
 
         <div style={{ maxWidth: '680px', margin: '0 auto', padding: '28px 24px' }}>
           {error && (
-            <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', color: '#dc2626', fontSize: '14px' }}>❌ {error}</div>
+            <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', color: '#dc2626', fontSize: '14px' }}>
+              {error}
+            </div>
           )}
 
           <form onSubmit={handleSubmit} className="new-item-form">
@@ -111,14 +123,21 @@ export default function NewItemPage() {
             {/* Image Upload */}
             <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e8edf2', padding: '22px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '12px' }}>Item Photo</label>
-              <div style={{ border: '2px dashed #cbd5e1', borderRadius: '14px', padding: '20px', textAlign: 'center', cursor: 'pointer', backgroundColor: '#f8fafc', position: 'relative' }}>
+              <div style={{
+                border: '2px dashed #cbd5e1', borderRadius: '14px', padding: '20px',
+                textAlign: 'center', cursor: 'pointer', backgroundColor: '#f8fafc', position: 'relative'
+              }}>
                 {imagePreview ? (
                   <img src={imagePreview} alt="Preview" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '10px' }} />
                 ) : (
-                  <div style={{ padding: '20px 0' }}>
-                    <p style={{ fontSize: '36px', marginBottom: '8px' }}>📷</p>
-                    <p style={{ fontSize: '14px', color: '#94a3b8', margin: '0 0 4px', fontWeight: '600' }}>Upload a photo</p>
-                    <p style={{ fontSize: '12px', color: '#cbd5e1', margin: 0 }}>PNG, JPG up to 10MB</p>
+                  <div style={{ padding: '28px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '52px', height: '52px', backgroundColor: '#eff6ff', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Camera size={24} color="#26619C" strokeWidth={1.8} />
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '14px', color: '#374151', margin: '0 0 4px', fontWeight: '600' }}>Upload a photo</p>
+                      <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0 }}>PNG, JPG up to 10MB</p>
+                    </div>
                   </div>
                 )}
                 <input type="file" accept="image/*" onChange={handleImageChange}
@@ -135,14 +154,18 @@ export default function NewItemPage() {
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Description</label>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Describe your item..." style={{ ...inputStyle, resize: 'none' as const, lineHeight: '1.6' }} />
+                <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
+                  placeholder="Describe your item..."
+                  style={{ ...inputStyle, resize: 'none' as const, lineHeight: '1.6' }} />
               </div>
 
               <div style={{ marginBottom: '16px' }}>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Category</label>
                 <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={inputStyle}>
                   <option value="">Select a category</option>
-                  {categories.map((cat) => <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>)}
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
                 </select>
               </div>
 
@@ -160,15 +183,23 @@ export default function NewItemPage() {
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '10px' }}>Condition</label>
                 <div className="condition-grid">
-                  {conditionOptions.map((opt) => (
-                    <button key={opt.value} type="button" onClick={() => setCondition(opt.value)} style={{
-                      padding: '12px 8px', borderRadius: '10px', cursor: 'pointer',
-                      border: condition === opt.value ? `2px solid ${opt.color}` : '2px solid #e2e8f0',
-                      backgroundColor: condition === opt.value ? `${opt.color}15` : '#f8fafc',
-                      color: condition === opt.value ? opt.color : '#64748b',
-                      fontWeight: '600', fontSize: '13px'
-                    }}>{opt.label}</button>
-                  ))}
+                  {conditionOptions.map((opt) => {
+                    const isActive = condition === opt.value
+                    return (
+                      <button key={opt.value} type="button" onClick={() => setCondition(opt.value)} style={{
+                        padding: '12px 8px', borderRadius: '12px', cursor: 'pointer',
+                        border: `2px solid ${isActive ? opt.activeBorder : '#e2e8f0'}`,
+                        backgroundColor: isActive ? opt.activeBg : '#f8fafc',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+                        transition: 'all 0.15s'
+                      }}>
+                        {opt.icon}
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: isActive ? opt.activeColor : '#64748b' }}>
+                          {opt.label}
+                        </span>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             </div>
@@ -176,86 +207,49 @@ export default function NewItemPage() {
             {/* Price Preview */}
             <div style={{
               background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
-              borderRadius: '16px',
-              padding: '24px',
-              boxShadow: '0 4px 16px rgba(26,58,92,0.25)',
-              transition: 'all 0.3s'
+              borderRadius: '16px', padding: '24px',
+              boxShadow: '0 4px 16px rgba(26,58,92,0.25)'
             }}>
-              <p style={{
-                fontSize: '11px',
-                color: 'rgba(255,255,255,0.5)',
-                margin: '0 0 16px',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em'
-              }}>
+              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                 Price Preview
               </p>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr 1fr',
-                gap: '12px'
-              }}>
-                {[
-                  { days: 1, label: '1 day' },
-                  { days: 3, label: '3 days' },
-                  { days: 7, label: '7 days' },
-                ].map(({ days, label }) => {
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                {[{ days: 1, label: '1 day' }, { days: 3, label: '3 days' }, { days: 7, label: '7 days' }].map(({ days, label }) => {
                   const price = pricePerDay && parseFloat(pricePerDay) > 0
-                    ? (parseFloat(pricePerDay) * days).toFixed(0)
-                    : '--';
-
+                    ? (parseFloat(pricePerDay) * days).toFixed(0) : '--'
                   return (
                     <div key={days} style={{
                       backgroundColor: 'rgba(255,255,255,0.1)',
                       border: '1px solid rgba(255,255,255,0.15)',
-                      borderRadius: '12px',
-                      padding: '14px',
-                      textAlign: 'center'
+                      borderRadius: '12px', padding: '14px', textAlign: 'center'
                     }}>
-                      <p style={{
-                        fontSize: '22px',
-                        fontWeight: '800',
-                        color: '#ffffff',
-                        margin: '0 0 4px',
-                        lineHeight: 1
-                      }}>
+                      <p style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', margin: '0 0 4px', lineHeight: 1 }}>
                         {price !== '--' ? `₱${price}` : '--'}
                       </p>
-
-                      <p style={{
-                        fontSize: '11px',
-                        color: 'rgba(255,255,255,0.5)',
-                        margin: 0,
-                        fontWeight: '600'
-                      }}>
-                        {label}
-                      </p>
+                      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0, fontWeight: '600' }}>{label}</p>
                     </div>
-                  );
+                  )
                 })}
               </div>
-
               {(!pricePerDay || parseFloat(pricePerDay) <= 0) && (
-                <p style={{
-                  fontSize: '12px',
-                  color: 'rgba(255,255,255,0.4)',
-                  margin: '12px 0 0',
-                  textAlign: 'center'
-                }}>
+                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', margin: '12px 0 0', textAlign: 'center' }}>
                   Enter a price above to see the preview
                 </p>
               )}
             </div>
 
+            {/* Submit */}
             <button type="submit" disabled={loading} style={{
               width: '100%', padding: '16px',
               background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1a3a5c, #26619C)',
               color: '#ffffff', fontWeight: '700', borderRadius: '14px',
               border: 'none', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 16px rgba(26,58,92,0.3)'
-            }}>{loading ? 'Listing item...' : '🚀 List Item'}</button>
+              boxShadow: '0 4px 16px rgba(26,58,92,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+            }}>
+              <ImagePlus size={20} strokeWidth={2} />
+              {loading ? 'Listing item...' : 'List Item'}
+            </button>
 
           </form>
         </div>
