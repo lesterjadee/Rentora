@@ -1,6 +1,14 @@
 import {
-  BookOpen, Laptop, FlaskConical, Dumbbell, Palette,
-  Music, Shirt, Wrench, Camera, Package
+  BookOpen,
+  Laptop,
+  FlaskConical,
+  Dumbbell,
+  Palette,
+  Music,
+  Shirt,
+  Wrench,
+  Camera,
+  Package
 } from 'lucide-react'
 
 interface CategoryIconProps {
@@ -10,18 +18,16 @@ interface CategoryIconProps {
 }
 
 export function CategoryIcon({ name, size = 24, color = '#26619C' }: CategoryIconProps) {
-  const props = { size, color, strokeWidth: 1.8 }
-  const map: Record<string, JSX.Element> = {
-    'Books':                <BookOpen {...props} />,
-    'Electronics':          <Laptop {...props} />,
-    'Laboratory Equipment': <FlaskConical {...props} />,
-    'Sports & Recreation':  <Dumbbell {...props} />,
-    'Art & Design':         <Palette {...props} />,
-    'Music Instruments':    <Music {...props} />,
-    'Clothing & Costumes':  <Shirt {...props} />,
-    'Tools & Equipment':    <Wrench {...props} />,
-    'Photography':          <Camera {...props} />,
-    'Other':                <Package {...props} />,
-  }
-  return map[name] || <Package {...props} />
+  const iconProps = { size, color, strokeWidth: 1.8 }
+
+  if (name === 'Books') return <BookOpen {...iconProps} />
+  if (name === 'Electronics') return <Laptop {...iconProps} />
+  if (name === 'Laboratory Equipment') return <FlaskConical {...iconProps} />
+  if (name === 'Sports & Recreation') return <Dumbbell {...iconProps} />
+  if (name === 'Art & Design') return <Palette {...iconProps} />
+  if (name === 'Music Instruments') return <Music {...iconProps} />
+  if (name === 'Clothing & Costumes') return <Shirt {...iconProps} />
+  if (name === 'Tools & Equipment') return <Wrench {...iconProps} />
+  if (name === 'Photography') return <Camera {...iconProps} />
+  return <Package {...iconProps} />
 }

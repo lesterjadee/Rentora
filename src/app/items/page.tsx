@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { Search, SlidersHorizontal, PlusCircle, X, Package } from 'lucide-react'
+import { Search, SlidersHorizontal, PlusCircle, X, Package, Star } from 'lucide-react'
 import { CategoryIcon } from '@/lib/categoryIcon'
 
 export default function ItemsPage() {
@@ -25,8 +25,9 @@ export default function ItemsPage() {
   const fetchItems = async () => {
     setLoading(true)
     let query = supabase.from('items')
-      .select(`*, profiles(full_name, trust_score), categories(name, icon)`)
-      .eq('status', 'available').order('created_at', { ascending: false })
+      .select('*, profiles(full_name, trust_score), categories(name, icon)')
+      .eq('status', 'available')
+      .order('created_at', { ascending: false })
     if (search) query = query.ilike('title', `%${search}%`)
     if (selectedCategory) query = query.eq('category_id', selectedCategory)
     const { data } = await query
@@ -47,30 +48,35 @@ export default function ItemsPage() {
         {/* Banner */}
         <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #26619C 100%)', padding: '40px 24px' }}>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap' as const, gap: '12px' }}>
               <div>
-                <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '6px' }}>Marketplace</p>
-                <h1 style={{ fontSize: 'clamp(24px, 5vw, 32px)', fontWeight: '800', color: '#ffffff', margin: 0 }}>Browse Items</h1>
+                <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase' as const, marginBottom: '6px' }}>Marketplace</p>
+                <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#ffffff', margin: 0 }}>Browse Items</h1>
               </div>
               <Link href="/items/new" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
                 padding: '10px 20px', backgroundColor: 'rgba(255,255,255,0.15)',
                 color: '#ffffff', fontWeight: '600', borderRadius: '12px',
-                textDecoration: 'none', fontSize: '14px', border: '1px solid rgba(255,255,255,0.2)',
-                whiteSpace: 'nowrap'
+                textDecoration: 'none', fontSize: '14px',
+                border: '1px solid rgba(255,255,255,0.2)', whiteSpace: 'nowrap' as const
               }}>
-                <PlusCircle size={16} strokeWidth={2} /> List an Item
+                <PlusCircle size={16} strokeWidth={2} />
+                List an Item
               </Link>
             </div>
 
-            {/* Search bar */}
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <div style={{ flex: 1, minWidth: '180px', position: 'relative' }}>
-                <Search size={16} color="rgba(255,255,255,0.5)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
-                <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            {/* Search */}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' as const }}>
+              <div style={{ flex: 1, minWidth: '180px', position: 'relative' as const }}>
+                <div style={{ position: 'absolute' as const, left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' as const }}>
+                  <Search size={16} color="rgba(255,255,255,0.5)" strokeWidth={2} />
+                </div>
+                <input
+                  type="text" value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search items..."
                   style={{
-                    width: '100%', padding: '12px 16px 12px 40px',
+                    width: '100%', padding: '12px 16px 12px 42px',
                     backgroundColor: 'rgba(255,255,255,0.12)',
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: '12px', fontSize: '14px', color: '#ffffff',
@@ -78,30 +84,43 @@ export default function ItemsPage() {
                   }}
                 />
               </div>
-              <div style={{ position: 'relative' }}>
-                <SlidersHorizontal size={15} color="rgba(255,255,255,0.5)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}
+
+              <div style={{ position: 'relative' as const }}>
+                <div style={{ position: 'absolute' as const, left: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' as const }}>
+                  <SlidersHorizontal size={15} color="rgba(255,255,255,0.5)" strokeWidth={2} />
+                </div>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
                   style={{
                     padding: '12px 14px 12px 34px',
                     backgroundColor: 'rgba(255,255,255,0.12)',
                     border: '1px solid rgba(255,255,255,0.2)',
                     borderRadius: '12px', fontSize: '14px', color: '#ffffff',
-                    outline: 'none', cursor: 'pointer', minWidth: '150px'
-                  }}>
+                    outline: 'none', cursor: 'pointer', minWidth: '160px'
+                  }}
+                >
                   <option value="" style={{ color: '#0f172a', backgroundColor: '#fff' }}>All Categories</option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id} style={{ color: '#0f172a', backgroundColor: '#fff' }}>{cat.name}</option>
+                    <option key={cat.id} value={cat.id} style={{ color: '#0f172a', backgroundColor: '#fff' }}>
+                      {cat.name}
+                    </option>
                   ))}
                 </select>
               </div>
+
               {(search || selectedCategory) && (
-                <button onClick={() => { setSearch(''); setSelectedCategory('') }}
+                <button
+                  onClick={() => { setSearch(''); setSelectedCategory('') }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '12px 16px', backgroundColor: 'rgba(255,255,255,0.12)',
-                    border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px',
-                    fontSize: '14px', color: '#ffffff', cursor: 'pointer', fontWeight: '600'
-                  }}>
+                    padding: '12px 16px',
+                    backgroundColor: 'rgba(255,255,255,0.12)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    borderRadius: '12px', fontSize: '14px', color: '#ffffff',
+                    cursor: 'pointer', fontWeight: '600'
+                  }}
+                >
                   <X size={14} strokeWidth={2.5} /> Clear
                 </button>
               )}
@@ -124,17 +143,19 @@ export default function ItemsPage() {
                   <div style={{
                     backgroundColor: '#ffffff', borderRadius: '18px',
                     border: '1px solid #e8edf2', overflow: 'hidden',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)', cursor: 'pointer',
-                    transition: 'all 0.2s'
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)', cursor: 'pointer'
                   }}>
-                    {/* Image area */}
+                    {/* Image */}
                     <div style={{
                       height: '170px', backgroundColor: '#f8fafc',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      position: 'relative', overflow: 'hidden'
+                      position: 'relative' as const, overflow: 'hidden'
                     }}>
                       {item.image_url ? (
-                        <img src={item.image_url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img
+                          src={item.image_url} alt={item.title}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' as const }}
+                        />
                       ) : (
                         <div style={{
                           width: '64px', height: '64px', backgroundColor: '#eff6ff',
@@ -143,12 +164,11 @@ export default function ItemsPage() {
                           <CategoryIcon name={item.categories?.name || 'Other'} size={32} color="#26619C" />
                         </div>
                       )}
-                      {/* Category badge */}
                       <span style={{
-                        position: 'absolute', top: '12px', left: '12px',
+                        position: 'absolute' as const, top: '12px', left: '12px',
                         backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: '8px',
                         padding: '4px 10px', fontSize: '11px', fontWeight: '600', color: '#374151',
-                        border: '1px solid #f1f5f9', backdropFilter: 'blur(8px)'
+                        border: '1px solid #f1f5f9'
                       }}>
                         {item.categories?.name}
                       </span>
@@ -156,7 +176,9 @@ export default function ItemsPage() {
 
                     {/* Info */}
                     <div style={{ padding: '16px 18px' }}>
-                      <p style={{ fontWeight: '700', fontSize: '15px', color: '#0f172a', margin: '0 0 6px' }}>{item.title}</p>
+                      <p style={{ fontWeight: '700', fontSize: '15px', color: '#0f172a', margin: '0 0 6px' }}>
+                        {item.title}
+                      </p>
                       {item.description && (
                         <p style={{
                           fontSize: '13px', color: '#94a3b8', margin: '0 0 14px', lineHeight: '1.5',
@@ -164,17 +186,26 @@ export default function ItemsPage() {
                           WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as any
                         }}>{item.description}</p>
                       )}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '12px', borderTop: '1px solid #f8fafc' }}>
+                      <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        paddingTop: '12px', borderTop: '1px solid #f8fafc'
+                      }}>
                         <div>
-                          <span style={{ fontSize: '22px', fontWeight: '800', color: '#26619C' }}>₱{item.price_per_day}</span>
+                          <span style={{ fontSize: '22px', fontWeight: '800', color: '#26619C' }}>
+                            ₱{item.price_per_day}
+                          </span>
                           <span style={{ fontSize: '12px', color: '#94a3b8' }}>/day</span>
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <p style={{ fontSize: '12px', color: '#64748b', margin: 0, fontWeight: '500' }}>{item.profiles?.full_name}</p>
+                        <div style={{ textAlign: 'right' as const }}>
+                          <p style={{ fontSize: '12px', color: '#64748b', margin: 0, fontWeight: '500' }}>
+                            {item.profiles?.full_name}
+                          </p>
                           {item.profiles?.trust_score > 0 && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end', marginTop: '2px' }}>
-                              <Star size={11} fill="#d97706" color="#d97706" />
-                              <span style={{ fontSize: '11px', color: '#d97706', fontWeight: '700' }}>{item.profiles.trust_score}</span>
+                              <Star size={11} fill="#d97706" color="#d97706" strokeWidth={1} />
+                              <span style={{ fontSize: '11px', color: '#d97706', fontWeight: '700' }}>
+                                {item.profiles.trust_score}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -189,7 +220,11 @@ export default function ItemsPage() {
               backgroundColor: '#ffffff', borderRadius: '20px',
               border: '1px solid #e8edf2', padding: '80px 24px', textAlign: 'center'
             }}>
-              <div style={{ width: '64px', height: '64px', backgroundColor: '#f8fafc', borderRadius: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <div style={{
+                width: '64px', height: '64px', backgroundColor: '#f8fafc',
+                borderRadius: '18px', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', margin: '0 auto 16px'
+              }}>
                 <Package size={28} color="#94a3b8" strokeWidth={1.5} />
               </div>
               <p style={{ fontWeight: '700', fontSize: '20px', color: '#0f172a', marginBottom: '8px' }}>No items found</p>
@@ -198,8 +233,10 @@ export default function ItemsPage() {
               </p>
               <Link href="/items/new" style={{
                 display: 'inline-flex', alignItems: 'center', gap: '8px',
-                padding: '12px 28px', background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
-                color: '#ffffff', fontWeight: '600', borderRadius: '12px', textDecoration: 'none', fontSize: '14px'
+                padding: '12px 28px',
+                background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
+                color: '#ffffff', fontWeight: '600', borderRadius: '12px',
+                textDecoration: 'none', fontSize: '14px'
               }}>
                 <PlusCircle size={16} strokeWidth={2} /> List an Item
               </Link>
