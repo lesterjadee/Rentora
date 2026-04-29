@@ -106,7 +106,7 @@ export default function RegisterPage() {
               ))}
             </div>
             <div style={{ padding: '18px 26px', borderTop: '1px solid #1C1C1C', flexShrink: 0, display: 'flex', gap: '10px' }}>
-              <button onClick={() => { setAgreedToTerms(true); setShowTerms(false) }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #0F3D2E, #1A7A57)', border: '1px solid rgba(46,204,143,0.3)', color: '#2ECC8F', fontWeight: '700', borderRadius: '11px', border: 'none', fontSize: '14px', cursor: 'pointer' }}>
+              <button onClick={() => { setAgreedToTerms(true); setShowTerms(false) }} style={{ flex: 1, padding: '12px', background: 'linear-gradient(135deg, #0F3D2E, #1A7A57)', border: '1px solid rgba(46,204,143,0.3)', color: '#2ECC8F', fontWeight: '700', borderRadius: '11px', fontSize: '14px', cursor: 'pointer' }}>
                 I Agree to the Terms
               </button>
               <button onClick={() => setShowTerms(false)} style={{ padding: '12px 18px', background: '#1C1C1C', color: '#A3A3A3', fontWeight: '600', borderRadius: '11px', border: '1px solid #2E2E2E', fontSize: '13px', cursor: 'pointer' }}>
