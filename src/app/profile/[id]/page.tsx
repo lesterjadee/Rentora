@@ -39,9 +39,15 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   const avgRating = totalReviews > 0
     ? (reviews!.reduce((sum, r) => sum + r.rating, 0) / totalReviews)
     : 0
-  const commScore = Math.min(100, Math.round(avgRating * 20 + Math.random() * 5))
-  const qualScore = Math.min(100, Math.round(avgRating * 18 + Math.random() * 8))
-  const relScore = Math.min(100, Math.round(avgRating * 19 + Math.random() * 6))
+  const commScore = totalReviews > 0
+  ? Math.round((reviews!.reduce((sum, r) => sum + (r.communication_rating || (r.rating * 2)), 0) / totalReviews) * 10)
+  : 0
+  const qualScore = totalReviews > 0
+  ? Math.round((reviews!.reduce((sum, r) => sum + (r.item_quality_rating || (r.rating * 2)), 0) / totalReviews) * 10)
+  : 0
+  const relScore = totalReviews > 0
+  ? Math.round((reviews!.reduce((sum, r) => sum + (r.reliability_rating || (r.rating * 2)), 0) / totalReviews) * 10)
+  : 0
 
   const StarRating = ({ rating }: { rating: number }) => (
     <div style={{ display: 'flex', gap: '3px' }}>
