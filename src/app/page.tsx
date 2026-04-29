@@ -3,414 +3,491 @@ import Link from 'next/link'
 import {
   ShieldCheck, Star, Bell, Sparkles,
   Camera, CalendarCheck, ArrowRight,
-  Users, Package, TrendingUp
+  Users, Package, TrendingUp, ChevronRight
 } from 'lucide-react'
 
 export default async function Home() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
   const { count: itemCount } = await supabase.from('items').select('*', { count: 'exact', head: true }).eq('status', 'available')
   const { count: userCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true })
   const { count: rentalCount } = await supabase.from('rentals').select('*', { count: 'exact', head: true })
 
   const features = [
-    { icon: <ShieldCheck size={22} color="#2ECC8F" strokeWidth={1.8} />, title: 'Verified Students Only', desc: 'Only .edu.ph institutional emails are accepted, so every user is a confirmed enrolled student.' },
-    { icon: <Star size={22} color="#F59E0B" strokeWidth={1.8} />, title: 'Trust Score System', desc: 'Every completed rental builds a public reputation. Know who you are dealing with before you commit.' },
-    { icon: <Sparkles size={22} color="#3B82F6" strokeWidth={1.8} />, title: 'Smart Recommendations', desc: 'The For You page learns from your rental history and surfaces items most relevant to you.' },
-    { icon: <Bell size={22} color="#A78BFA" strokeWidth={1.8} />, title: 'Real-Time Notifications', desc: 'Instant alerts the moment your rental is approved, declined, or completed.' },
-    { icon: <Camera size={22} color="#2ECC8F" strokeWidth={1.8} />, title: 'Photo Listings', desc: 'Upload clear photos so renters know exactly what they are getting before they request.' },
-    { icon: <CalendarCheck size={22} color="#F59E0B" strokeWidth={1.8} />, title: 'Conflict-Free Booking', desc: 'Automatic date validation prevents double bookings on every single request.' },
-  ]
-
-  const steps = [
-    { n: '01', title: 'Create your account', desc: 'Sign up with your .edu.ph email. Verification is automatic.' },
-    { n: '02', title: 'Browse or list items', desc: 'Find what you need or list your own items to earn from them.' },
-    { n: '03', title: 'Rent with confidence', desc: 'Request, agree on dates, and transact safely within a trusted community.' },
+    { icon: <ShieldCheck size={20} strokeWidth={1.8} />, color: '#22A876', label: 'green', title: 'Verified Students Only', desc: 'Only .edu.ph institutional emails accepted. Every user is a confirmed enrolled student.' },
+    { icon: <Star size={20} strokeWidth={1.8} />, color: '#C9A84C', label: 'gold', title: 'Trust Score System', desc: 'Every completed rental builds a public reputation. Know who you\'re dealing with before you commit.' },
+    { icon: <Sparkles size={20} strokeWidth={1.8} />, color: '#22A876', label: 'green', title: 'Smart Recommendations', desc: 'The For You page learns from your history and surfaces items most relevant to you.' },
+    { icon: <Bell size={20} strokeWidth={1.8} />, color: '#C9A84C', label: 'gold', title: 'Real-Time Notifications', desc: 'Instant alerts the moment your rental is approved, declined, or completed.' },
+    { icon: <Camera size={20} strokeWidth={1.8} />, color: '#22A876', label: 'green', title: 'Photo Listings', desc: 'Upload clear photos so renters know exactly what they\'re getting before requesting.' },
+    { icon: <CalendarCheck size={20} strokeWidth={1.8} />, color: '#C9A84C', label: 'gold', title: 'Conflict-Free Booking', desc: 'Automatic date validation prevents double bookings on every single request.' },
   ]
 
   return (
     <>
       <style>{`
-        body { background-color: #0A0A0A; }
-        .hp-section { padding: 100px 24px; }
-        .hp-inner { max-width: 1100px; margin: 0 auto; }
-        .hp-badge {
+        .hp { background: var(--bg-void); color: var(--tx-body); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; overflow-x: hidden; }
+        .hp-hero {
+          position: relative; padding: 140px 28px 120px;
+          overflow: hidden;
+        }
+        .hp-hero-bg {
+          position: absolute; inset: 0; pointer-events: none;
+          background:
+            radial-gradient(ellipse 80% 60% at 60% -10%, rgba(15,61,42,0.5) 0%, transparent 60%),
+            radial-gradient(ellipse 60% 40% at 10% 80%, rgba(13,43,26,0.3) 0%, transparent 50%),
+            radial-gradient(ellipse 40% 30% at 90% 60%, rgba(201,168,76,0.04) 0%, transparent 40%);
+        }
+        .hp-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; max-width: 1280px; margin: 0 auto; position: relative; }
+        .hp-overline {
           display: inline-flex; align-items: center; gap: 8px;
-          background: rgba(46,204,143,0.08);
-          border: 1px solid rgba(46,204,143,0.2);
-          border-radius: 999px; padding: 6px 16px;
-          font-size: 12px; font-weight: 600;
-          color: #2ECC8F; letter-spacing: 0.05em;
-          text-transform: uppercase;
+          font-size: 11px; font-weight: 800;
+          color: #22A876; letter-spacing: 0.12em;
+          text-transform: uppercase; margin-bottom: 24px;
         }
-        .hp-dot { width: 6px; height: 6px; background: #2ECC8F; border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+        .hp-overline-dot {
+          width: 5px; height: 5px; border-radius: 50%;
+          background: #22A876;
+          box-shadow: 0 0 8px rgba(34,168,118,0.6);
+          animation: breathe 2s ease infinite;
+        }
         .hp-h1 {
-          font-size: clamp(40px, 7vw, 72px);
-          font-weight: 900; line-height: 1.05;
-          letter-spacing: -0.04em; color: #F0F0F0;
-          margin: 0;
+          font-size: clamp(44px, 6.5vw, 76px);
+          font-weight: 900; line-height: 1.02;
+          letter-spacing: -0.05em;
+          color: var(--tx-bright); margin-bottom: 24px;
         }
-        .hp-h1-accent {
-          background: linear-gradient(135deg, #2ECC8F, #4EDDAA, #2ECC8F);
+        .hp-h1-line2 {
+          display: block;
+          background: linear-gradient(135deg, #2ECC8F 0%, #4EDDAA 40%, #C9A84C 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
         }
         .hp-sub {
-          font-size: clamp(15px, 2vw, 18px);
-          color: #606060; line-height: 1.8;
-          max-width: 480px;
+          font-size: clamp(15px, 1.8vw, 17px);
+          color: var(--tx-muted); line-height: 1.85;
+          max-width: 460px; margin-bottom: 40px;
+          font-weight: 400;
         }
-        .hp-btn-primary {
-          display: inline-flex; align-items: center; gap: 10px;
-          padding: 14px 28px;
-          background: linear-gradient(135deg, #0F3D2E, #1A7A57);
-          border: 1px solid rgba(46,204,143,0.3);
-          color: #2ECC8F; font-size: 15px; font-weight: 700;
-          border-radius: 12px; text-decoration: none;
-          transition: all 0.25s;
-          box-shadow: 0 0 30px rgba(15,61,46,0.4);
+        .hp-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px; }
+        .hp-stats-row {
+          display: flex; gap: 0;
+          border: 1px solid var(--border-sub);
+          border-radius: 16px; overflow: hidden;
+          background: var(--bg-raised);
         }
-        .hp-btn-primary:hover {
-          background: linear-gradient(135deg, #145C42, #1A7A57);
-          border-color: rgba(46,204,143,0.5);
-          box-shadow: 0 0 40px rgba(46,204,143,0.2);
-          transform: translateY(-1px);
+        .hp-stat {
+          flex: 1; padding: 18px 22px;
+          border-right: 1px solid var(--border-sub);
+          transition: background 0.2s;
         }
-        .hp-btn-ghost {
-          display: inline-flex; align-items: center; gap: 8px;
-          padding: 14px 28px;
-          background: transparent;
-          border: 1px solid #2E2E2E;
-          color: #A3A3A3; font-size: 15px; font-weight: 600;
-          border-radius: 12px; text-decoration: none;
-          transition: all 0.2s;
-        }
-        .hp-btn-ghost:hover { border-color: #3a3a3a; color: #F0F0F0; background: #1C1C1C; }
-        .hp-stat-card {
-          background: #111111;
-          border: 1px solid #1C1C1C;
-          border-radius: 14px; padding: 24px;
-          text-align: center;
-          transition: border-color 0.2s;
-        }
-        .hp-stat-card:hover { border-color: rgba(46,204,143,0.2); }
-        .hp-feature-card {
-          background: #111111;
-          border: 1px solid #1C1C1C;
-          border-radius: 16px; padding: 28px;
-          transition: all 0.25s;
-        }
-        .hp-feature-card:hover {
-          border-color: rgba(46,204,143,0.2);
-          background: #141414;
-          transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }
-        .hp-feature-icon {
-          width: 48px; height: 48px;
-          background: #1C1C1C;
-          border: 1px solid #2E2E2E;
-          border-radius: 14px;
-          display: flex; align-items: center; justify-content: center;
-          margin-bottom: 16px;
-        }
-        .hp-step-num {
-          font-size: 48px; font-weight: 900;
-          color: #1C1C1C; letter-spacing: -0.04em;
-          line-height: 1; margin-bottom: 12px;
-        }
-        .hp-divider { height: 1px; background: linear-gradient(90deg, transparent, #1C1C1C, transparent); }
-        .hp-cta-box {
-          background: linear-gradient(135deg, #0A2118, #0F3D2E);
-          border: 1px solid rgba(46,204,143,0.15);
+        .hp-stat:last-child { border-right: none; }
+        .hp-stat:hover { background: var(--bg-card); }
+        .hp-stat-val { font-size: 26px; font-weight: 900; color: var(--tx-bright); letter-spacing: -0.04em; margin-bottom: 3px; }
+        .hp-stat-lbl { font-size: 11px; color: var(--tx-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+        .hp-hero-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-mid);
           border-radius: 24px;
-          padding: clamp(48px, 8vw, 80px) clamp(24px, 5vw, 64px);
-          text-align: center;
+          padding: 26px;
+          box-shadow: var(--shadow-xl), 0 0 0 1px rgba(34,168,118,0.06);
+          position: relative;
+        }
+        .hp-hero-card-glow {
+          position: absolute; inset: -1px;
+          border-radius: 24px;
+          background: linear-gradient(135deg, rgba(34,168,118,0.15), transparent 40%, rgba(201,168,76,0.08) 100%);
+          pointer-events: none;
+          z-index: -1;
+        }
+        .hp-item-img {
+          background: var(--bg-raised);
+          border: 1px solid var(--border-sub);
+          border-radius: 16px; height: 170px;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 60px; margin-bottom: 20px;
           position: relative; overflow: hidden;
         }
-        .hp-cta-glow {
-          position: absolute; top: -100px; left: 50%;
-          transform: translateX(-50%);
-          width: 400px; height: 400px; border-radius: 50%;
-          background: radial-gradient(circle, rgba(46,204,143,0.08), transparent);
+        .hp-item-img::after {
+          content: ''; position: absolute; inset: 0;
+          background: linear-gradient(135deg, rgba(15,61,42,0.2), transparent);
           pointer-events: none;
         }
-        .hp-footer-inner {
-          display: flex; justify-content: space-between;
-          align-items: center; flex-wrap: wrap; gap: 16px;
+        .hp-notif-pop {
+          position: absolute; bottom: -18px; right: -18px;
+          background: var(--bg-overlay);
+          border: 1px solid var(--border-mid);
+          border-radius: 14px; padding: 11px 15px;
+          display: flex; align-items: center; gap: 10px;
+          box-shadow: var(--shadow-lg), 0 0 0 1px rgba(201,168,76,0.08);
+          z-index: 10;
         }
-        .hp-features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .hp-steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
-        .hp-stats-grid { display: flex; gap: 32px; padding-top: 40px; border-top: 1px solid #1C1C1C; flex-wrap: wrap; }
-        .hp-hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .hp-section { padding: 100px 28px; max-width: 1280px; margin: 0 auto; }
+        .hp-section-sm { padding: 80px 28px; }
+        .hp-eyebrow { font-size: 11px; font-weight: 800; color: var(--g-bright); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .hp-eyebrow::before { content: ''; width: 20px; height: 2px; background: var(--g-bright); border-radius: 1px; }
+        .hp-section-title { font-size: clamp(30px,4.5vw,50px); font-weight: 900; color: var(--tx-bright); letter-spacing: -0.04em; line-height: 1.08; margin-bottom: 16px; }
+        .hp-section-sub { font-size: 16px; color: var(--tx-muted); max-width: 460px; line-height: 1.75; }
+        .hp-features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .hp-feature-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-sub);
+          border-radius: 18px; padding: 26px;
+          transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+          position: relative; overflow: hidden;
+        }
+        .hp-feature-card.gold:hover {
+          border-color: rgba(201,168,76,0.2);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,168,76,0.08);
+          transform: translateY(-3px);
+        }
+        .hp-feature-card.green:hover {
+          border-color: rgba(34,168,118,0.2);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(34,168,118,0.08);
+          transform: translateY(-3px);
+        }
+        .hp-feature-card::after {
+          content: ''; position: absolute;
+          inset: 0; border-radius: 18px; opacity: 0;
+          transition: opacity 0.3s;
+          pointer-events: none;
+        }
+        .hp-feature-card.gold::after { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(201,168,76,0.05), transparent); }
+        .hp-feature-card.green::after { background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(34,168,118,0.05), transparent); }
+        .hp-feature-card:hover::after { opacity: 1; }
+        .hp-icon-box-gold {
+          width: 46px; height: 46px; border-radius: 13px;
+          background: linear-gradient(135deg, var(--au-deep), rgba(90,63,20,0.6));
+          border: 1px solid rgba(201,168,76,0.2);
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 18px; color: var(--au-mid);
+          box-shadow: 0 4px 12px rgba(201,168,76,0.08);
+        }
+        .hp-icon-box-green {
+          width: 46px; height: 46px; border-radius: 13px;
+          background: linear-gradient(135deg, var(--g-deep), rgba(13,43,26,0.8));
+          border: 1px solid rgba(34,168,118,0.2);
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 18px; color: var(--g-bright);
+          box-shadow: 0 4px 12px rgba(34,168,118,0.08);
+        }
+        .hp-steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; }
+        .hp-step {
+          padding: 40px 36px;
+          border-right: 1px solid var(--border-sub);
+          position: relative;
+        }
+        .hp-step:last-child { border-right: none; }
+        .hp-step:hover { background: var(--bg-raised); }
+        .hp-step-num { font-size: 72px; font-weight: 900; letter-spacing: -0.06em; line-height: 1; margin-bottom: 16px; }
         .hp-trust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-        @media (max-width: 900px) {
-          .hp-features-grid { grid-template-columns: 1fr 1fr; }
-          .hp-hero-grid { grid-template-columns: 1fr; }
-          .hp-trust-grid { grid-template-columns: 1fr; }
+        .hp-trust-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-mid);
+          border-radius: 24px; padding: 32px;
+          box-shadow: var(--shadow-xl);
+          position: relative; overflow: hidden;
         }
-        @media (max-width: 600px) {
+        .hp-trust-card::before {
+          content: ''; position: absolute;
+          top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+        }
+        .hp-progress-bar { height: 5px; background: var(--bg-raised); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+        .hp-cta-section {
+          position: relative; overflow: hidden;
+          margin: 0 28px 80px;
+          border-radius: 28px;
+          padding: 80px 48px;
+          background: linear-gradient(135deg, #080E0A 0%, #0D2B1A 40%, #0A1A10 70%, #080808 100%);
+          border: 1px solid rgba(34,168,118,0.12);
+          text-align: center;
+        }
+        .hp-cta-section::before {
+          content: ''; position: absolute;
+          top: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(34,168,118,0.4), rgba(201,168,76,0.3), transparent);
+        }
+        .hp-cta-section::after {
+          content: ''; position: absolute;
+          bottom: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
+        }
+        .hp-cta-glow {
+          position: absolute; top: -120px; left: 50%;
+          transform: translateX(-50%);
+          width: 600px; height: 400px;
+          background: radial-gradient(ellipse, rgba(34,168,118,0.08) 0%, transparent 60%);
+          pointer-events: none;
+        }
+        .hp-footer { border-top: 1px solid var(--border-sub); padding: 32px 28px; }
+        .hp-footer-inner { max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+        @media (max-width: 1024px) {
+          .hp-hero-grid { grid-template-columns: 1fr; gap: 60px; }
+          .hp-trust-grid { grid-template-columns: 1fr; gap: 48px; }
+        }
+        @media (max-width: 768px) {
+          .hp-features-grid { grid-template-columns: 1fr 1fr; }
+          .hp-steps-grid { grid-template-columns: 1fr; }
+          .hp-step { border-right: none; border-bottom: 1px solid var(--border-sub); }
+          .hp-step:last-child { border-bottom: none; }
+          .hp-hero { padding: 80px 20px 80px; }
+          .hp-section { padding: 72px 20px; }
+          .hp-cta-section { margin: 0 20px 60px; padding: 56px 28px; }
+        }
+        @media (max-width: 480px) {
           .hp-features-grid { grid-template-columns: 1fr; }
-          .hp-steps-grid { grid-template-columns: 1fr; gap: 24px; }
-          .hp-section { padding: 64px 20px; }
+          .hp-stats-row { flex-direction: column; }
+          .hp-stat { border-right: none; border-bottom: 1px solid var(--border-sub); }
         }
       `}</style>
 
-      <div style={{ backgroundColor: '#0A0A0A', color: '#F0F0F0', fontFamily: 'system-ui, sans-serif', minHeight: '100vh' }}>
+      <div className="hp">
 
-        {/* HERO */}
-        <section className="hp-section" style={{ paddingTop: '120px', paddingBottom: '120px' }}>
-          <div className="hp-inner">
-            <div className="hp-hero-grid">
-              <div>
-                <div className="hp-badge" style={{ marginBottom: '28px' }}>
-                  <div className="hp-dot" />
-                  Campus Rental Platform
-                </div>
-                <h1 className="hp-h1" style={{ marginBottom: '20px' }}>
-                  Rent smarter.<br />
-                  <span className="hp-h1-accent">Save more.</span>
-                </h1>
-                <p className="hp-sub" style={{ marginBottom: '36px' }}>
-                  Rentora connects college students to rent, lend, and manage academic items — from calculators to lab equipment — within a trusted campus network.
-                </p>
-                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '48px' }}>
-                  {user ? (
-                    <Link href="/dashboard" className="hp-btn-primary">
-                      Go to Dashboard <ArrowRight size={16} strokeWidth={2.5} />
-                    </Link>
-                  ) : (
-                    <>
-                      <Link href="/auth/register" className="hp-btn-primary">
-                        Get started free <ArrowRight size={16} strokeWidth={2.5} />
-                      </Link>
-                      <Link href="/auth/login" className="hp-btn-ghost">
-                        Sign in
-                      </Link>
-                    </>
-                  )}
-                </div>
-
-                <div className="hp-stats-grid">
-                  {[
-                    { icon: <Package size={16} color="#2ECC8F" />, value: itemCount ?? 0, label: 'Items available' },
-                    { icon: <Users size={16} color="#2ECC8F" />, value: userCount ?? 0, label: 'Students enrolled' },
-                    { icon: <TrendingUp size={16} color="#2ECC8F" />, value: rentalCount ?? 0, label: 'Rentals completed' },
-                  ].map((stat, i) => (
-                    <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '2px' }}>
-                        {stat.icon}
-                      </div>
-                      <p style={{ fontSize: '28px', fontWeight: '800', color: '#F0F0F0', margin: 0, letterSpacing: '-0.03em' }}>{stat.value}</p>
-                      <p style={{ fontSize: '12px', color: '#606060', margin: 0 }}>{stat.label}</p>
-                    </div>
-                  ))}
-                </div>
+        {/* ── HERO ── */}
+        <section className="hp-hero">
+          <div className="hp-hero-bg" />
+          <div className="hp-hero-grid">
+            <div className="animate-fade-up">
+              <div className="hp-overline">
+                <div className="hp-overline-dot" />
+                Campus Rental Platform
               </div>
-
-              {/* Hero Card */}
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <div style={{ position: 'relative', width: '100%', maxWidth: '340px' }}>
-                  <div style={{ position: 'absolute', top: '12px', left: '12px', right: '-12px', bottom: '-12px', background: 'linear-gradient(135deg, #0F3D2E, #0A2118)', borderRadius: '20px', border: '1px solid rgba(46,204,143,0.1)' }} />
-                  <div style={{ position: 'relative', background: '#111111', borderRadius: '20px', border: '1px solid #1C1C1C', padding: '24px', boxShadow: '0 20px 60px rgba(0,0,0,0.6)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                      <span style={{ fontSize: '11px', fontWeight: '700', color: '#606060', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Featured Item</span>
-                      <span style={{ fontSize: '11px', fontWeight: '700', color: '#2ECC8F', background: 'rgba(46,204,143,0.1)', border: '1px solid rgba(46,204,143,0.2)', borderRadius: '999px', padding: '3px 10px' }}>Available</span>
-                    </div>
-                    <div style={{ background: '#1C1C1C', borderRadius: '14px', height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '20px', fontSize: '56px', border: '1px solid #2E2E2E' }}>🔬</div>
-                    <h3 style={{ fontWeight: '700', fontSize: '16px', color: '#F0F0F0', margin: '0 0 4px' }}>Scientific Calculator</h3>
-                    <p style={{ fontSize: '12px', color: '#606060', margin: '0 0 16px' }}>Casio fx-991EX · Like New</p>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid #1C1C1C' }}>
-                      <div>
-                        <span style={{ fontSize: '22px', fontWeight: '800', color: '#2ECC8F' }}>₱50</span>
-                        <span style={{ fontSize: '12px', color: '#606060' }}>/day</span>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <Star size={12} fill="#F59E0B" color="#F59E0B" />
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: '#A3A3A3' }}>4.9</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', background: '#111111', border: '1px solid #1C1C1C', borderRadius: '14px', padding: '12px 16px', boxShadow: '0 8px 24px rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10 }}>
-                    <div style={{ width: '32px', height: '32px', background: 'rgba(46,204,143,0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>✅</div>
-                    <div>
-                      <p style={{ fontSize: '12px', fontWeight: '700', color: '#F0F0F0', margin: 0 }}>Rental Approved!</p>
-                      <p style={{ fontSize: '11px', color: '#606060', margin: 0 }}>Just now</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="hp-divider" />
-
-        {/* FEATURES */}
-        <section className="hp-section">
-          <div className="hp-inner">
-            <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-              <div className="hp-badge" style={{ marginBottom: '20px' }}>Why Rentora</div>
-              <h2 style={{ fontSize: 'clamp(28px,5vw,42px)', fontWeight: '800', color: '#F0F0F0', margin: '0 0 16px', letterSpacing: '-0.03em' }}>
-                Everything you need.<br />Nothing you don't.
-              </h2>
-              <p style={{ fontSize: '16px', color: '#606060', maxWidth: '440px', margin: '0 auto', lineHeight: '1.7' }}>
-                Built for college students with safety and trust as the foundation.
+              <h1 className="hp-h1">
+                Rent smarter.
+                <span className="hp-h1-line2">Save more.</span>
+              </h1>
+              <p className="hp-sub">
+                Rentora connects college students to rent, lend, and manage academic items within a trusted, verified campus network.
               </p>
-            </div>
-            <div className="hp-features-grid">
-              {features.map((f, i) => (
-                <div key={i} className="hp-feature-card">
-                  <div className="hp-feature-icon">{f.icon}</div>
-                  <h3 style={{ fontWeight: '700', fontSize: '15px', color: '#F0F0F0', marginBottom: '8px' }}>{f.title}</h3>
-                  <p style={{ fontSize: '13px', color: '#606060', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <div className="hp-divider" />
-
-        {/* HOW IT WORKS */}
-        <section className="hp-section">
-          <div className="hp-inner">
-            <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-              <div className="hp-badge" style={{ marginBottom: '20px' }}>How it works</div>
-              <h2 style={{ fontSize: 'clamp(28px,5vw,42px)', fontWeight: '800', color: '#F0F0F0', margin: '0 0 16px', letterSpacing: '-0.03em' }}>
-                Up and running in minutes
-              </h2>
-              <p style={{ fontSize: '16px', color: '#606060', lineHeight: '1.7' }}>
-                Three simple steps between you and the item you need.
-              </p>
-            </div>
-            <div className="hp-steps-grid">
-              {steps.map((step, i) => (
-                <div key={i} style={{ textAlign: 'center' }}>
-                  <div className="hp-step-num">{step.n}</div>
-                  <div style={{ width: '48px', height: '2px', background: 'linear-gradient(90deg, #0F3D2E, #2ECC8F)', borderRadius: '999px', margin: '0 auto 18px' }} />
-                  <h3 style={{ fontWeight: '700', fontSize: '17px', color: '#F0F0F0', marginBottom: '10px' }}>{step.title}</h3>
-                  <p style={{ fontSize: '14px', color: '#606060', lineHeight: '1.7', maxWidth: '260px', margin: '0 auto' }}>{step.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <div className="hp-divider" />
-
-        {/* TRUST SECTION */}
-        <section className="hp-section">
-          <div className="hp-inner">
-            <div className="hp-trust-grid">
-              <div>
-                <div className="hp-badge" style={{ marginBottom: '20px' }}>Trust & Safety</div>
-                <h2 style={{ fontSize: 'clamp(26px,4vw,40px)', fontWeight: '800', color: '#F0F0F0', letterSpacing: '-0.03em', lineHeight: '1.2', marginBottom: '20px' }}>
-                  Your reputation<br />matters here.
-                </h2>
-                <p style={{ fontSize: '15px', color: '#606060', lineHeight: '1.8', marginBottom: '32px' }}>
-                  Every rental you complete builds your Trust Score — a transparent rating visible to the entire community.
-                </p>
-                {[
-                  { title: 'Identity verified', desc: 'Institutional email required for all accounts' },
-                  { title: 'Ratings after every rental', desc: 'Both parties rate each other after completion' },
-                  { title: 'Transparent trust scores', desc: 'Visible on every user profile' },
-                ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(46,204,143,0.1)', border: '1px solid rgba(46,204,143,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
-                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2ECC8F' }} />
-                    </div>
-                    <div>
-                      <p style={{ fontWeight: '600', fontSize: '14px', color: '#F0F0F0', margin: '0 0 2px' }}>{item.title}</p>
-                      <p style={{ fontSize: '12px', color: '#606060', margin: 0 }}>{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ background: '#111111', border: '1px solid #1C1C1C', borderRadius: '20px', padding: '28px', boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '20px' }}>
-                  <div style={{ width: '52px', height: '52px', background: 'linear-gradient(135deg, #0F3D2E, #1A7A57)', border: '1px solid rgba(46,204,143,0.3)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2ECC8F', fontWeight: '800', fontSize: '20px' }}>L</div>
-                  <div>
-                    <p style={{ fontWeight: '700', fontSize: '16px', color: '#F0F0F0', margin: 0 }}>Lester Jade Lobos</p>
-                    <p style={{ fontSize: '12px', color: '#606060', margin: 0 }}>College Student · 2024</p>
-                  </div>
-                </div>
-                <div style={{ background: '#1C1C1C', borderRadius: '14px', padding: '18px', marginBottom: '16px', border: '1px solid #2E2E2E' }}>
-                  <p style={{ fontSize: '11px', color: '#606060', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Trust Score</p>
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', marginBottom: '12px' }}>
-                    <span style={{ fontSize: '40px', fontWeight: '800', color: '#2ECC8F', lineHeight: 1 }}>4.8</span>
-                    <span style={{ fontSize: '13px', color: '#606060', marginBottom: '4px' }}>/ 5.0</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '4px' }}>
-                    {[1,2,3,4,5].map(s => (
-                      <div key={s} style={{ height: '6px', flex: 1, borderRadius: '999px', background: s <= 4 ? '#2ECC8F' : '#1C1C1C', border: s > 4 ? '1px solid #2E2E2E' : 'none' }} />
-                    ))}
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-                  {[{ l: 'Rentals', v: '12' }, { l: 'Reviews', v: '10' }, { l: 'Items', v: '3' }].map((s, i) => (
-                    <div key={i} style={{ textAlign: 'center', padding: '14px 8px', background: '#1C1C1C', borderRadius: '12px', border: '1px solid #2E2E2E' }}>
-                      <p style={{ fontSize: '20px', fontWeight: '800', color: '#F0F0F0', margin: 0 }}>{s.v}</p>
-                      <p style={{ fontSize: '11px', color: '#606060', margin: '4px 0 0' }}>{s.l}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="hp-divider" />
-
-        {/* CTA */}
-        <section className="hp-section">
-          <div className="hp-inner">
-            <div className="hp-cta-box">
-              <div className="hp-cta-glow" />
-              <h2 style={{ fontSize: 'clamp(28px,5vw,48px)', fontWeight: '900', color: '#F0F0F0', letterSpacing: '-0.04em', marginBottom: '16px', lineHeight: '1.1', position: 'relative' }}>
-                Your campus marketplace<br />is waiting.
-              </h2>
-              <p style={{ fontSize: 'clamp(14px,2vw,17px)', color: '#606060', marginBottom: '36px', maxWidth: '420px', margin: '0 auto 36px', lineHeight: '1.7', position: 'relative' }}>
-                Join students already using Rentora to save money and share resources.
-              </p>
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', position: 'relative' }}>
+              <div className="hp-cta-row">
                 {user ? (
-                  <Link href="/items" className="hp-btn-primary">
-                    Browse items now <ArrowRight size={16} strokeWidth={2.5} />
+                  <Link href="/dashboard" className="btn-gold">
+                    Go to Dashboard <ArrowRight size={16} strokeWidth={2.5} />
                   </Link>
                 ) : (
                   <>
-                    <Link href="/auth/register" className="hp-btn-primary">
-                      Create free account <ArrowRight size={16} strokeWidth={2.5} />
+                    <Link href="/auth/register" className="btn-gold">
+                      Get started free <ArrowRight size={16} strokeWidth={2.5} />
                     </Link>
-                    <Link href="/auth/login" className="hp-btn-ghost">
+                    <Link href="/auth/login" className="btn-ghost">
                       Sign in
                     </Link>
                   </>
                 )}
               </div>
+              <div className="hp-stats-row">
+                {[
+                  { icon: <Package size={14} color="#22A876" />, value: itemCount ?? 0, label: 'Items available' },
+                  { icon: <Users size={14} color="#22A876" />, value: userCount ?? 0, label: 'Students enrolled' },
+                  { icon: <TrendingUp size={14} color="#C9A84C" />, value: rentalCount ?? 0, label: 'Rentals completed' },
+                ].map((stat, i) => (
+                  <div key={i} className="hp-stat">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>{stat.icon}</div>
+                    <div className="hp-stat-val">{stat.value}</div>
+                    <div className="hp-stat-lbl">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="animate-fade-up-delay" style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', width: '100%', maxWidth: '360px' }}>
+                <div className="hp-hero-card">
+                  <div className="hp-hero-card-glow" />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Featured Item</span>
+                    <span className="status-available">Available</span>
+                  </div>
+                  <div className="hp-item-img">🔬</div>
+                  <h3 style={{ fontWeight: '800', fontSize: '16px', color: 'var(--tx-bright)', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Scientific Calculator</h3>
+                  <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: '0 0 20px' }}>Casio fx-991EX · Like New</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '18px', borderTop: '1px solid var(--border-sub)' }}>
+                    <div>
+                      <span style={{ fontSize: '26px', fontWeight: '900', color: '#2ECC8F', letterSpacing: '-0.03em' }}>₱50</span>
+                      <span style={{ fontSize: '12px', color: 'var(--tx-muted)' }}>/day</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '999px' }}>
+                      <Star size={12} fill="#C9A84C" color="#C9A84C" />
+                      <span style={{ fontSize: '13px', fontWeight: '800', color: '#E2C07A' }}>4.9</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="hp-notif-pop">
+                  <div style={{ width: '30px', height: '30px', background: 'linear-gradient(135deg, var(--au-deep), rgba(90,63,20,0.5))', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>✅</div>
+                  <div>
+                    <p style={{ fontSize: '12px', fontWeight: '700', color: 'var(--tx-bright)', margin: 0 }}>Rental Approved!</p>
+                    <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: 0 }}>Just now</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* FOOTER */}
-        <footer style={{ borderTop: '1px solid #1C1C1C', padding: '32px 24px' }}>
-          <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-            <div className="hp-footer-inner">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{ width: '26px', height: '26px', background: 'linear-gradient(135deg, #0F3D2E, #1A7A57)', border: '1px solid rgba(46,204,143,0.3)', borderRadius: '7px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '800', color: '#2ECC8F' }}>R</div>
-                <span style={{ fontWeight: '700', color: '#A3A3A3', fontSize: '14px' }}>Rentora</span>
-                <span style={{ color: '#2E2E2E' }}>·</span>
-                <span style={{ fontSize: '13px', color: '#606060' }}>Student Item Rental Hub</span>
+        <div className="divider" />
+
+        {/* ── FEATURES ── */}
+        <section style={{ padding: '100px 28px', position: 'relative' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '80px', alignItems: 'flex-start' }}>
+              <div style={{ position: 'sticky', top: '100px' }}>
+                <div className="hp-eyebrow">Why Rentora</div>
+                <h2 className="hp-section-title">Built for students.<br /><span style={{ color: 'var(--tx-muted)', fontWeight: '400' }}>Not just anyone.</span></h2>
+                <p className="hp-section-sub" style={{ marginBottom: '28px' }}>
+                  Safety, trust, and simplicity — the three things students actually need in a rental platform.
+                </p>
+                <Link href={user ? '/items' : '/auth/register'} className="btn-green" style={{ display: 'inline-flex' }}>
+                  {user ? 'Browse items' : 'Join for free'} <ChevronRight size={16} strokeWidth={2.5} />
+                </Link>
               </div>
-              <p style={{ fontSize: '12px', color: '#606060', margin: 0 }}>© 2026 Rentora · Built for College Students · By Lester Jade Lobos</p>
+              <div className="hp-features-grid">
+                {features.map((f, i) => (
+                  <div key={i} className={`hp-feature-card ${f.label}`}>
+                    <div className={f.label === 'gold' ? 'hp-icon-box-gold' : 'hp-icon-box-green'}
+                      style={{ color: f.color }}>
+                      {f.icon}
+                    </div>
+                    <h3 style={{ fontWeight: '700', fontSize: '14px', color: 'var(--tx-bright)', marginBottom: '8px', letterSpacing: '-0.01em' }}>{f.title}</h3>
+                    <p style={{ fontSize: '13px', color: 'var(--tx-muted)', lineHeight: '1.7', margin: 0 }}>{f.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        </footer>
+        </section>
 
+        <div className="divider" />
+
+        {/* ── HOW IT WORKS ── */}
+        <section style={{ padding: '100px 28px' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+              <div className="hp-eyebrow" style={{ justifyContent: 'center' }}>How it works</div>
+              <h2 className="hp-section-title">Up and running<br /><span style={{ color: 'var(--g-neon)' }}>in minutes.</span></h2>
+            </div>
+            <div className="hp-steps-grid" style={{ border: '1px solid var(--border-sub)', borderRadius: '24px', overflow: 'hidden', background: 'var(--bg-card)' }}>
+              {[
+                { n: '01', color: 'var(--g-neon)', title: 'Create your account', desc: 'Sign up with your .edu.ph email. Verification is instant and automatic.' },
+                { n: '02', color: 'var(--au-mid)', title: 'Browse or list items', desc: 'Find what you need or list your own items to earn from them while they sit unused.' },
+                { n: '03', color: 'var(--g-neon)', title: 'Rent with confidence', desc: 'Request, agree on dates, and transact safely within a community built on trust.' },
+              ].map((step, i) => (
+                <div key={i} className="hp-step" style={{ transition: 'background 0.2s' }}>
+                  <div className="hp-step-num" style={{ color: step.color === 'var(--g-neon)' ? 'rgba(46,204,143,0.12)' : 'rgba(201,168,76,0.1)' }}>{step.n}</div>
+                  <div style={{ width: '28px', height: '3px', background: step.color, borderRadius: '999px', marginBottom: '18px', boxShadow: `0 0 12px ${step.color === 'var(--g-neon)' ? 'rgba(46,204,143,0.4)' : 'rgba(201,168,76,0.4)'}` }} />
+                  <h3 style={{ fontWeight: '800', fontSize: '16px', color: 'var(--tx-bright)', marginBottom: '10px', letterSpacing: '-0.02em' }}>{step.title}</h3>
+                  <p style={{ fontSize: '13px', color: 'var(--tx-muted)', lineHeight: '1.75', maxWidth: '260px' }}>{step.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <div className="divider" />
+
+        {/* ── TRUST ── */}
+        <section style={{ padding: '100px 28px' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div className="hp-trust-grid">
+              <div>
+                <div className="hp-eyebrow">Trust & Safety</div>
+                <h2 className="hp-section-title">Your reputation<br /><span className="gold-shimmer">is currency.</span></h2>
+                <p className="hp-section-sub" style={{ marginBottom: '32px' }}>
+                  Every rental you complete builds your Trust Score — a transparent rating visible to the entire community.
+                </p>
+                {[
+                  { title: 'Identity verified', desc: 'Institutional email required for all accounts' },
+                  { title: 'Ratings after every rental', desc: 'Both parties rate each other after completion' },
+                  { title: 'Transparent trust scores', desc: 'Visible on every user profile, always' },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: 'flex', gap: '14px', marginBottom: '18px' }}>
+                    <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px' }}>
+                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--au-mid)' }} />
+                    </div>
+                    <div>
+                      <p style={{ fontWeight: '700', fontSize: '14px', color: 'var(--tx-bright)', margin: '0 0 3px' }}>{item.title}</p>
+                      <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="hp-trust-card">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '24px', paddingBottom: '24px', borderBottom: '1px solid var(--border-sub)' }}>
+                  <div style={{ width: '52px', height: '52px', background: 'linear-gradient(135deg, var(--g-dark), var(--g-vivid))', border: '1px solid rgba(34,168,118,0.3)', borderRadius: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#22A876', fontWeight: '900', fontSize: '20px', boxShadow: '0 0 20px rgba(34,168,118,0.15)' }}>L</div>
+                  <div>
+                    <p style={{ fontWeight: '800', fontSize: '16px', color: 'var(--tx-bright)', margin: '0 0 3px', letterSpacing: '-0.02em' }}>Lester Jade Lobos</p>
+                    <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>College Student · 2024</p>
+                  </div>
+                  <div style={{ marginLeft: 'auto' }}>
+                    <span className="gold-badge"><Star size={10} fill="#C9A84C" color="#C9A84C" /> 4.8</span>
+                  </div>
+                </div>
+
+                <div style={{ background: 'var(--bg-raised)', borderRadius: '16px', padding: '20px', marginBottom: '16px', border: '1px solid var(--border-sub)' }}>
+                  <p style={{ fontSize: '11px', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '10px', fontWeight: '700' }}>Trust Score</p>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', marginBottom: '14px' }}>
+                    <span style={{ fontSize: '48px', fontWeight: '900', letterSpacing: '-0.05em', lineHeight: 1 }} className="gold-shimmer">4.8</span>
+                    <span style={{ fontSize: '16px', color: 'var(--tx-muted)', marginBottom: '4px' }}>/ 5.0</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    {[1,2,3,4,5].map(s => (
+                      <div key={s} style={{ height: '5px', flex: 1, borderRadius: '999px', background: s <= 4 ? 'linear-gradient(90deg, var(--au-dark), var(--au-mid))' : 'var(--bg-hover)', boxShadow: s <= 4 ? '0 0 6px rgba(201,168,76,0.3)' : 'none' }} />
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                  {[{ l: 'Rentals', v: '12' }, { l: 'Reviews', v: '10' }, { l: 'Items', v: '3' }].map((s, i) => (
+                    <div key={i} style={{ textAlign: 'center', padding: '14px 8px', background: 'var(--bg-raised)', borderRadius: '12px', border: '1px solid var(--border-sub)', transition: 'border-color 0.2s' }}>
+                      <p style={{ fontSize: '22px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.04em' }}>{s.v}</p>
+                      <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: '4px 0 0', textTransform: 'uppercase', letterSpacing: '0.06em', fontWeight: '600' }}>{s.l}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA ── */}
+        <div className="hp-cta-section">
+          <div className="hp-cta-glow" />
+          <div style={{ position: 'relative' }}>
+            <span className="green-badge" style={{ marginBottom: '24px', display: 'inline-flex' }}>
+              <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--g-neon)', animation: 'breathe 2s ease infinite' }} />
+              Open to all students
+            </span>
+            <h2 style={{ fontSize: 'clamp(32px,5vw,56px)', fontWeight: '900', color: 'var(--tx-bright)', letterSpacing: '-0.05em', marginBottom: '16px', lineHeight: '1.05' }}>
+              Your campus marketplace<br /><span className="gold-shimmer">is waiting.</span>
+            </h2>
+            <p style={{ fontSize: '16px', color: 'var(--tx-muted)', marginBottom: '40px', maxWidth: '420px', margin: '0 auto 40px', lineHeight: '1.8' }}>
+              Join students already using Rentora to save money and share resources.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              {user ? (
+                <Link href="/items" className="btn-gold">Browse items now <ArrowRight size={16} strokeWidth={2.5} /></Link>
+              ) : (
+                <>
+                  <Link href="/auth/register" className="btn-gold">Create free account <ArrowRight size={16} strokeWidth={2.5} /></Link>
+                  <Link href="/auth/login" className="btn-ghost">Sign in</Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── FOOTER ── */}
+        <footer className="hp-footer">
+          <div className="hp-footer-inner">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '28px', height: '28px', background: 'linear-gradient(135deg, var(--g-dark), var(--g-vivid))', border: '1px solid rgba(34,168,118,0.3)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '900', color: '#22A876' }}>R</div>
+              <span style={{ fontWeight: '800', color: 'var(--tx-muted)', fontSize: '14px', letterSpacing: '-0.01em' }}>Rentora</span>
+              <span style={{ color: 'var(--border-mid)', fontSize: '16px' }}>·</span>
+              <span style={{ fontSize: '13px', color: 'var(--tx-dim)' }}>Student Item Rental Hub</span>
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--tx-dim)', margin: 0 }}>© 2026 Rentora · Built for College Students · By Lester Jade Lobos</p>
+          </div>
+        </footer>
       </div>
     </>
   )
