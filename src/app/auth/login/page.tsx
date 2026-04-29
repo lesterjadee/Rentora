@@ -4,20 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-
-const EyeIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>
-  </svg>
-)
-
-const EyeOffIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-    <line x1="1" y1="1" x2="23" y2="23"/>
-  </svg>
-)
+import { Eye, EyeOff, ShieldCheck, Star, Bell, Sparkles, ArrowRight } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,112 +27,134 @@ export default function LoginPage() {
   return (
     <>
       <style>{`
-        .login-container { display: flex; min-height: 100vh; font-family: system-ui, sans-serif; }
-        .login-left { width: 45%; background: linear-gradient(160deg, #1a3a5c 0%, #0f2744 40%, #26619C 100%); padding: 60px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
-        .login-right { flex: 1; background-color: #f8fafc; display: flex; align-items: center; justify-content: center; padding: 48px; }
-        .login-features { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; padding: 0; display: flex; align-items: center; justify-content: center; }
-        .pw-toggle:hover { color: #64748b; }
+        body { background: #0A0A0A; }
+        .auth-container { display: flex; min-height: 100vh; font-family: system-ui, sans-serif; }
+        .auth-left { width: 44%; background: linear-gradient(160deg, #0A2118 0%, #0F3D2E 60%, #0A0A0A 100%); padding: 60px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; border-right: 1px solid #1C1C1C; }
+        .auth-right { flex: 1; background: #0A0A0A; display: flex; align-items: center; justify-content: center; padding: 48px; }
+        .auth-input {
+          width: 100%; padding: 14px 16px;
+          background: #111111; border: 1px solid #1C1C1C;
+          border-radius: 12px; font-size: 14px; color: #F0F0F0;
+          outline: none; box-sizing: border-box;
+          transition: border-color 0.2s;
+        }
+        .auth-input::placeholder { color: #606060; }
+        .auth-input:focus { border-color: rgba(46,204,143,0.4); }
+        .auth-btn-primary {
+          width: 100%; padding: 14px;
+          background: linear-gradient(135deg, #0F3D2E, #1A7A57);
+          border: 1px solid rgba(46,204,143,0.3);
+          color: #2ECC8F; font-weight: 700; border-radius: 12px;
+          font-size: 15px; cursor: pointer;
+          transition: all 0.25s;
+          box-shadow: 0 4px 20px rgba(15,61,46,0.4);
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .auth-btn-primary:hover {
+          background: linear-gradient(135deg, #145C42, #1A7A57);
+          box-shadow: 0 4px 30px rgba(46,204,143,0.2);
+          transform: translateY(-1px);
+        }
+        .auth-btn-primary:disabled { background: #1C1C1C; border-color: #2E2E2E; color: #606060; cursor: not-allowed; transform: none; box-shadow: none; }
+        .auth-feature-pill {
+          background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 12px; padding: 12px 14px;
+          display: flex; align-items: center; gap: 10px;
+        }
+        .pw-toggle-btn {
+          position: absolute; right: 14px; top: 50%;
+          transform: translateY(-50%); background: none;
+          border: none; cursor: pointer; color: #606060;
+          padding: 0; display: flex; align-items: center;
+          transition: color 0.2s;
+        }
+        .pw-toggle-btn:hover { color: #A3A3A3; }
         @media (max-width: 768px) {
-          .login-left { display: none; }
-          .login-right { padding: 32px 24px; }
+          .auth-left { display: none; }
+          .auth-right { padding: 32px 24px; }
         }
       `}</style>
 
-      <div className="login-container">
-        <div className="login-left">
-          <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59,130,246,0.2), transparent)' }} />
+      <div className="auth-container">
+        {/* Left */}
+        <div className="auth-left">
+          <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '320px', height: '320px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(46,204,143,0.06), transparent)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(46,204,143,0.04), transparent)', pointerEvents: 'none' }} />
+
           <div style={{ position: 'relative' }}>
-            <Link href="/" style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '60px' }}>
-                <div style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg, #3b82f6, #60a5fa)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#fff', fontSize: '18px' }}>R</div>
-                <span style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff' }}>Rentora</span>
-              </div>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '64px' }}>
+              <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #0F3D2E, #1A7A57)', border: '1px solid rgba(46,204,143,0.3)', borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#2ECC8F', fontSize: '17px' }}>R</div>
+              <span style={{ fontSize: '21px', fontWeight: '800', background: 'linear-gradient(135deg, #2ECC8F, #4EDDAA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Rentora</span>
             </Link>
-            <h2 style={{ fontSize: '40px', fontWeight: '800', color: '#ffffff', lineHeight: '1.2', letterSpacing: '-0.02em', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '38px', fontWeight: '900', color: '#F0F0F0', lineHeight: '1.15', letterSpacing: '-0.04em', marginBottom: '16px' }}>
               The smarter way<br />to rent on campus.
             </h2>
-            <p style={{ fontSize: '16px', color: 'rgba(255,255,255,0.6)', lineHeight: '1.7', maxWidth: '340px' }}>
-              Connect with verified students to rent and lend academic items safely within your campus network.
+            <p style={{ fontSize: '15px', color: '#606060', lineHeight: '1.8', maxWidth: '320px' }}>
+              Connect with verified students to rent and lend academic items safely.
             </p>
           </div>
-          <div className="login-features">
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', position: 'relative' }}>
             {[
-              { icon: '🔐', text: 'Verified students only' },
-              { icon: '⭐', text: 'Trust score system' },
-              { icon: '🔔', text: 'Real-time updates' },
-              { icon: '🎯', text: 'Smart recommendations' },
+              { icon: <ShieldCheck size={16} color="#2ECC8F" strokeWidth={2} />, text: 'Verified students' },
+              { icon: <Star size={16} color="#F59E0B" strokeWidth={2} />, text: 'Trust scores' },
+              { icon: <Bell size={16} color="#A78BFA" strokeWidth={2} />, text: 'Real-time alerts' },
+              { icon: <Sparkles size={16} color="#3B82F6" strokeWidth={2} />, text: 'Smart picks' },
             ].map((f, i) => (
-              <div key={i} style={{ backgroundColor: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', padding: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '18px' }}>{f.icon}</span>
-                <span style={{ fontSize: '13px', fontWeight: '500', color: 'rgba(255,255,255,0.8)' }}>{f.text}</span>
+              <div key={i} className="auth-feature-pill">
+                {f.icon}
+                <span style={{ fontSize: '12px', fontWeight: '500', color: '#A3A3A3' }}>{f.text}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="login-right">
+        {/* Right */}
+        <div className="auth-right">
           <div style={{ width: '100%', maxWidth: '400px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
-              <div style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg, #1a3a5c, #26619C)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', color: '#fff', fontSize: '16px' }}>R</div>
-              <span style={{ fontSize: '20px', fontWeight: '800', color: '#1a3a5c' }}>Rentora</span>
+            <div style={{ marginBottom: '40px' }}>
+              <h1 style={{ fontSize: '30px', fontWeight: '900', color: '#F0F0F0', letterSpacing: '-0.04em', marginBottom: '8px' }}>Welcome back</h1>
+              <p style={{ fontSize: '14px', color: '#606060' }}>Sign in to your Rentora account</p>
             </div>
 
-            <h1 style={{ fontSize: '30px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '8px' }}>Welcome back</h1>
-            <p style={{ fontSize: '15px', color: '#64748b', marginBottom: '36px' }}>Sign in to your Rentora account</p>
-
             {error && (
-              <div style={{ marginBottom: '20px', padding: '14px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', color: '#dc2626', fontSize: '14px' }}>
-                ❌ {error}
+              <div style={{ marginBottom: '20px', padding: '13px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', color: '#FCA5A5', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>⚠️</span> {error}
               </div>
             )}
 
             <form onSubmit={handleLogin}>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Institutional Email</label>
-                <input
-                  type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
-                  placeholder="yourname@school.edu.ph"
-                  style={{ width: '100%', padding: '14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
-                />
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#A3A3A3', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  School Email
+                </label>
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="yourname@school.edu.ph" className="auth-input" />
               </div>
 
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Password</label>
+              <div style={{ marginBottom: '28px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#A3A3A3', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                  Password
+                </label>
                 <div style={{ position: 'relative' }}>
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password} onChange={(e) => setPassword(e.target.value)} required
-                    placeholder="Enter your password"
-                    style={{ width: '100%', padding: '14px 48px 14px 16px', backgroundColor: '#ffffff', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', color: '#0f172a', outline: 'none', boxSizing: 'border-box' as const }}
-                  />
-                  <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Enter your password" className="auth-input" style={{ paddingRight: '48px' }} />
+                  <button type="button" className="pw-toggle-btn" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff size={17} strokeWidth={2} /> : <Eye size={17} strokeWidth={2} />}
                   </button>
                 </div>
               </div>
 
-              <button type="submit" disabled={loading} style={{
-                width: '100%', padding: '14px',
-                background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1a3a5c, #26619C)',
-                color: '#ffffff', fontWeight: '700', borderRadius: '12px',
-                border: 'none', fontSize: '15px', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 16px rgba(26,58,92,0.3)', marginBottom: '16px'
-              }}>
-                {loading ? 'Signing in...' : 'Sign In →'}
+              <button type="submit" disabled={loading} className="auth-btn-primary" style={{ marginBottom: '16px' }}>
+                {loading ? 'Signing in...' : (<>Sign In <ArrowRight size={16} strokeWidth={2.5} /></>)}
               </button>
 
-              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-                <Link href="/auth/forgot-password" style={{ fontSize: '14px', fontWeight: '600', color: '#26619C', textDecoration: 'none' }}>
+              <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <Link href="/auth/forgot-password" style={{ fontSize: '13px', fontWeight: '600', color: '#2ECC8F', textDecoration: 'none', opacity: 0.8, transition: 'opacity 0.2s' }}>
                   Forgot password?
                 </Link>
               </div>
-
               <div style={{ textAlign: 'center' }}>
-                <span style={{ fontSize: '14px', color: '#64748b' }}>Don't have an account? </span>
-                <Link href="/auth/register" style={{ fontSize: '14px', fontWeight: '700', color: '#26619C', textDecoration: 'none' }}>
-                  Register here
-                </Link>
+                <span style={{ fontSize: '13px', color: '#606060' }}>Don't have an account? </span>
+                <Link href="/auth/register" style={{ fontSize: '13px', fontWeight: '700', color: '#2ECC8F', textDecoration: 'none' }}>Register here</Link>
               </div>
             </form>
           </div>

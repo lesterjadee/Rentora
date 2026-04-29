@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Bell, Star, ShoppingBag, PlusSquare, ClipboardList, Sparkles, Menu, X } from 'lucide-react'
+import {
+  ShoppingBag, PlusCircle, ClipboardList,
+  Sparkles, Bell, Star, Menu, X, LogIn
+} from 'lucide-react'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -13,17 +16,32 @@ export default function Navbar() {
   const [profile, setProfile] = useState<any>(null)
   const [notifCount, setNotifCount] = useState(0)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   const isAuthPage = pathname.startsWith('/auth')
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       setUser(user)
-      const { data: prof } = await supabase.from('profiles').select('full_name, trust_score').eq('id', user.id).single()
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('full_name, trust_score')
+        .eq('id', user.id)
+        .single()
       setProfile(prof)
-      const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('read', false)
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false)
       setNotifCount(count || 0)
     }
     fetchData()
@@ -33,7 +51,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/items',           label: 'Browse',    icon: <ShoppingBag size={15} strokeWidth={2} /> },
-    { href: '/items/new',       label: 'List Item',  icon: <PlusSquare size={15} strokeWidth={2} /> },
+    { href: '/items/new',       label: 'List Item',  icon: <PlusCircle size={15} strokeWidth={2} /> },
     { href: '/rentals',         label: 'Rentals',    icon: <ClipboardList size={15} strokeWidth={2} /> },
     { href: '/recommendations', label: 'For You',    icon: <Sparkles size={15} strokeWidth={2} /> },
   ]
@@ -41,130 +59,182 @@ export default function Navbar() {
   return (
     <>
       <style>{`
-        .nav-links-desktop { display: flex; align-items: center; gap: 2px; }
-        .nav-mobile-btn { display: none !important; }
-        .nav-mobile-menu { display: none; }
-        .nav-mobile-menu.open { display: flex; flex-direction: column; padding: 10px 0 14px; border-top: 1px solid #f1f5f9; }
+        .nav-root {
+          position: sticky; top: 0; z-index: 50;
+          background-color: ${scrolled ? 'rgba(10,10,10,0.95)' : '#0A0A0A'};
+          border-bottom: 1px solid #1C1C1C;
+          backdrop-filter: blur(12px);
+          transition: all 0.3s;
+          font-family: system-ui, sans-serif;
+        }
+        .nav-inner {
+          max-width: 1200px; margin: 0 auto;
+          padding: 0 24px;
+          display: flex; align-items: center;
+          justify-content: space-between;
+          height: 64px;
+        }
+        .nav-logo-text {
+          font-size: 20px; font-weight: 800;
+          background: linear-gradient(135deg, #2ECC8F, #4EDDAA);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          letter-spacing: -0.03em;
+        }
+        .nav-link {
+          display: flex; align-items: center; gap: 6px;
+          padding: 7px 14px; border-radius: 8px;
+          font-size: 13px; font-weight: 500;
+          text-decoration: none;
+          transition: all 0.2s;
+          color: #A3A3A3;
+        }
+        .nav-link:hover { color: #F0F0F0; background-color: #1C1C1C; }
+        .nav-link.active {
+          color: #2ECC8F;
+          background-color: rgba(46,204,143,0.1);
+        }
+        .nav-icon-btn {
+          width: 38px; height: 38px;
+          background: #1C1C1C; border: 1px solid #2E2E2E;
+          border-radius: 10px; display: flex;
+          align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.2s;
+          text-decoration: none;
+          color: #A3A3A3;
+        }
+        .nav-icon-btn:hover { background: #242424; border-color: #3a3a3a; color: #F0F0F0; }
+        .nav-trust-badge {
+          display: flex; align-items: center; gap: 5px;
+          padding: 5px 10px;
+          background: rgba(245,158,11,0.1);
+          border: 1px solid rgba(245,158,11,0.25);
+          border-radius: 8px;
+        }
+        .nav-avatar {
+          width: 38px; height: 38px;
+          background: linear-gradient(135deg, #0F3D2E, #1A7A57);
+          border: 1px solid rgba(46,204,143,0.3);
+          border-radius: 10px; display: flex;
+          align-items: center; justify-content: center;
+          color: #2ECC8F; font-weight: 800;
+          font-size: 14px; cursor: pointer;
+          text-decoration: none;
+          transition: all 0.2s;
+        }
+        .nav-avatar:hover { border-color: rgba(46,204,143,0.6); }
+        .nav-desktop-links { display: flex; align-items: center; gap: 2px; }
+        .nav-right { display: flex; align-items: center; gap: 8px; }
+        .nav-mobile-btn { display: none; }
+        .nav-mobile-menu { display: none; background: #0A0A0A; border-top: 1px solid #1C1C1C; padding: 12px 24px 16px; }
+        .nav-mobile-menu.open { display: flex; flex-direction: column; gap: 4px; }
+        .nav-mobile-link {
+          display: flex; align-items: center; gap: 10px;
+          padding: 12px 14px; border-radius: 10px;
+          font-size: 14px; font-weight: 500;
+          text-decoration: none; color: #A3A3A3;
+          transition: all 0.15s;
+        }
+        .nav-mobile-link:hover { background: #1C1C1C; color: #F0F0F0; }
+        .nav-mobile-link.active { background: rgba(46,204,143,0.1); color: #2ECC8F; }
+        .nav-get-started {
+          display: flex; align-items: center; gap: 7px;
+          padding: 8px 18px;
+          background: linear-gradient(135deg, #0F3D2E, #1A7A57);
+          border: 1px solid rgba(46,204,143,0.3);
+          color: #2ECC8F; font-size: 13px; font-weight: 600;
+          border-radius: 10px; text-decoration: none;
+          transition: all 0.2s;
+        }
+        .nav-get-started:hover {
+          background: linear-gradient(135deg, #145C42, #1A7A57);
+          border-color: rgba(46,204,143,0.5);
+          box-shadow: 0 0 16px rgba(46,204,143,0.15);
+        }
         @media (max-width: 768px) {
-          .nav-links-desktop { display: none !important; }
-          .nav-mobile-btn { display: flex !important; }
+          .nav-desktop-links { display: none; }
+          .nav-mobile-btn { display: flex; }
         }
       `}</style>
 
-      <nav style={{
-        backgroundColor: '#ffffff', borderBottom: '1px solid #f1f5f9',
-        padding: '0 24px', position: 'sticky', top: 0, zIndex: 50,
-        boxShadow: '0 1px 8px rgba(0,0,0,0.06)'
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
+      <nav className="nav-root">
+        <div className="nav-inner">
 
           {/* Logo */}
-          <Link href={user ? '/dashboard' : '/'} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link href={user ? '/dashboard' : '/'} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '9px' }}>
             <div style={{
               width: '32px', height: '32px',
-              background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
-              borderRadius: '9px', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', color: '#fff', fontWeight: '800', fontSize: '15px'
+              background: 'linear-gradient(135deg, #0F3D2E, #1A7A57)',
+              border: '1px solid rgba(46,204,143,0.3)',
+              borderRadius: '9px', display: 'flex',
+              alignItems: 'center', justifyContent: 'center',
+              fontSize: '15px', fontWeight: '800', color: '#2ECC8F'
             }}>R</div>
-            <span style={{ fontSize: '20px', fontWeight: '800', color: '#1a3a5c' }}>Rentora</span>
+            <span className="nav-logo-text">Rentora</span>
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Nav Links */}
           {user && (
-            <div className="nav-links-desktop">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href
-                return (
-                  <Link key={link.href} href={link.href} style={{ textDecoration: 'none' }}>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: '6px',
-                      padding: '8px 14px', borderRadius: '10px', fontSize: '14px',
-                      fontWeight: '500', cursor: 'pointer', transition: 'all 0.15s',
-                      color: isActive ? '#26619C' : '#64748b',
-                      backgroundColor: isActive ? '#eff6ff' : 'transparent',
-                    }}>
-                      <span style={{ color: isActive ? '#26619C' : '#94a3b8' }}>{link.icon}</span>
-                      {link.label}
-                    </div>
-                  </Link>
-                )
-              })}
+            <div className="nav-desktop-links">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`nav-link ${pathname === link.href ? 'active' : ''}`}
+                >
+                  {link.icon}
+                  {link.label}
+                </Link>
+              ))}
             </div>
           )}
 
-          {/* Right side */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Right Side */}
+          <div className="nav-right">
             {!user && (
               <>
-                <Link href="/auth/login" style={{ fontSize: '14px', fontWeight: '500', color: '#64748b', textDecoration: 'none', padding: '8px 14px' }}>Sign in</Link>
-                <Link href="/auth/register" style={{
-                  fontSize: '14px', fontWeight: '600', padding: '8px 18px',
-                  background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
-                  color: '#ffffff', borderRadius: '10px', textDecoration: 'none'
-                }}>Get started</Link>
+                <Link href="/auth/login" style={{ fontSize: '13px', fontWeight: '500', color: '#A3A3A3', textDecoration: 'none', padding: '8px 14px', borderRadius: '8px', transition: 'color 0.2s' }}>
+                  Sign in
+                </Link>
+                <Link href="/auth/register" className="nav-get-started">
+                  <LogIn size={14} strokeWidth={2} />
+                  Get started
+                </Link>
               </>
             )}
 
             {user && (
               <>
-                {/* Trust Score */}
                 {profile?.trust_score > 0 && (
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '5px',
-                    padding: '6px 10px', backgroundColor: '#fffbeb',
-                    borderRadius: '8px', border: '1px solid #fde68a'
-                  }}>
-                    <Star size={13} fill="#f59e0b" color="#f59e0b" />
-                    <span style={{ fontSize: '13px', fontWeight: '700', color: '#d97706' }}>{profile.trust_score}</span>
+                  <div className="nav-trust-badge">
+                    <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#F59E0B' }}>{profile.trust_score}</span>
                   </div>
                 )}
 
-                {/* Notifications */}
-                <Link href="/notifications" style={{ position: 'relative', textDecoration: 'none' }}>
-                  <div style={{
-                    width: '38px', height: '38px', backgroundColor: '#f8fafc',
-                    border: '1px solid #e2e8f0', borderRadius: '10px',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer'
-                  }}>
-                    <Bell size={18} color="#64748b" strokeWidth={1.8} />
-                  </div>
+                <Link href="/notifications" className="nav-icon-btn" style={{ position: 'relative' }}>
+                  <Bell size={17} strokeWidth={1.8} />
                   {notifCount > 0 && (
                     <span style={{
                       position: 'absolute', top: '-4px', right: '-4px',
-                      width: '18px', height: '18px', backgroundColor: '#ef4444',
-                      borderRadius: '50%', color: '#ffffff', fontSize: '10px',
-                      fontWeight: '700', display: 'flex', alignItems: 'center',
-                      justifyContent: 'center', border: '2px solid #fff'
+                      width: '17px', height: '17px',
+                      background: '#EF4444', borderRadius: '50%',
+                      color: '#fff', fontSize: '9px', fontWeight: '800',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      border: '2px solid #0A0A0A'
                     }}>{notifCount > 9 ? '9+' : notifCount}</span>
                   )}
                 </Link>
 
-                {/* Avatar */}
-                <Link href={user ? `/profile/${user.id}` : '/dashboard'} style={{ textDecoration: 'none' }}>
-                  <div style={{
-                    width: '38px', height: '38px',
-                    background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
-                    borderRadius: '10px', display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', color: '#ffffff',
-                    fontWeight: '700', fontSize: '15px', cursor: 'pointer'
-                  }}>
-                    {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
+                <Link href={`/profile/${user.id}`} className="nav-avatar">
+                  {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
                 </Link>
 
-                {/* Mobile hamburger */}
                 <button
-                  className="nav-mobile-btn"
+                  className="nav-icon-btn nav-mobile-btn"
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  style={{
-                    width: '38px', height: '38px', backgroundColor: '#f8fafc',
-                    border: '1px solid #e2e8f0', borderRadius: '10px',
-                    display: 'none', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer'
-                  }}
                 >
-                  {mobileOpen ? <X size={18} color="#374151" /> : <Menu size={18} color="#374151" />}
+                  {mobileOpen ? <X size={17} /> : <Menu size={17} />}
                 </button>
               </>
             )}
@@ -174,23 +244,17 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {user && (
           <div className={`nav-mobile-menu ${mobileOpen ? 'open' : ''}`}>
-            {navLinks.map((link) => {
-              const isActive = pathname === link.href
-              return (
-                <Link key={link.href} href={link.href} onClick={() => setMobileOpen(false)} style={{ textDecoration: 'none' }}>
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: '10px',
-                    padding: '13px 16px', fontSize: '15px', fontWeight: '500',
-                    color: isActive ? '#26619C' : '#374151',
-                    backgroundColor: isActive ? '#eff6ff' : 'transparent',
-                    borderRadius: '10px', margin: '2px 0'
-                  }}>
-                    <span style={{ color: isActive ? '#26619C' : '#94a3b8' }}>{link.icon}</span>
-                    {link.label}
-                  </div>
-                </Link>
-              )
-            })}
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`nav-mobile-link ${pathname === link.href ? 'active' : ''}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.icon}
+                {link.label}
+              </Link>
+            ))}
           </div>
         )}
       </nav>
