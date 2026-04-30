@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import { Star } from 'lucide-react'
+import { CategoryIcon } from '@/lib/categoryIcon'
 
 export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -7,19 +9,14 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', id).single()
   const { data: reviews } = await supabase
-    .from('reviews')
-    .select(`*, reviewer:profiles!reviews_reviewer_id_fkey(full_name)`)
-    .eq('reviewee_id', id)
-    .order('created_at', { ascending: false })
+    .from('reviews').select('*, reviewer:profiles!reviews_reviewer_id_fkey(full_name)')
+    .eq('reviewee_id', id).order('created_at', { ascending: false })
   const { data: items } = await supabase
-    .from('items')
-    .select('*, categories(name, icon)')
-    .eq('owner_id', id)
-    .eq('status', 'available')
+    .from('items').select('*, categories(name, icon)').eq('owner_id', id).eq('status', 'available')
 
   if (!profile) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: '#94a3b8' }}>Profile not found</p>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-void)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>
+      <p style={{ color: 'var(--tx-muted)' }}>Profile not found</p>
     </div>
   )
 
@@ -28,34 +25,27 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   const itemsListed = items?.length || 0
 
   const trustConfig = trustScore >= 4
-    ? { color: '#16a34a', bg: '#f0fdf4', border: '#86efac', label: 'Highly Trusted' }
+    ? { color: '#2ECC8F', bg: 'var(--g-glow)', border: 'rgba(34,168,118,0.25)', label: 'Highly Trusted' }
     : trustScore >= 3
-    ? { color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe', label: 'Trusted' }
+    ? { color: '#93C5FD', bg: 'rgba(59,130,246,0.1)', border: 'rgba(59,130,246,0.2)', label: 'Trusted' }
     : trustScore >= 2
-    ? { color: '#d97706', bg: '#fffbeb', border: '#fde68a', label: 'Building Trust' }
-    : { color: '#94a3b8', bg: '#f8fafc', border: '#e2e8f0', label: 'New Member' }
+    ? { color: '#E2C07A', bg: 'var(--au-glow)', border: 'rgba(201,168,76,0.25)', label: 'Building Trust' }
+    : { color: 'var(--tx-muted)', bg: 'rgba(255,255,255,0.04)', border: 'var(--border-sub)', label: 'New Member' }
 
-  // Calculate trust score breakdown from reviews
-  const avgRating = totalReviews > 0
-    ? (reviews!.reduce((sum, r) => sum + r.rating, 0) / totalReviews)
-    : 0
   const commScore = totalReviews > 0
-  ? Math.round((reviews!.reduce((sum, r) => sum + (r.communication_rating || (r.rating * 2)), 0) / totalReviews) * 10)
-  : 0
+    ? Math.round((reviews!.reduce((sum, r) => sum + (r.communication_rating || r.rating * 2), 0) / totalReviews) * 10)
+    : 0
   const qualScore = totalReviews > 0
-  ? Math.round((reviews!.reduce((sum, r) => sum + (r.item_quality_rating || (r.rating * 2)), 0) / totalReviews) * 10)
-  : 0
+    ? Math.round((reviews!.reduce((sum, r) => sum + (r.item_quality_rating || r.rating * 2), 0) / totalReviews) * 10)
+    : 0
   const relScore = totalReviews > 0
-  ? Math.round((reviews!.reduce((sum, r) => sum + (r.reliability_rating || (r.rating * 2)), 0) / totalReviews) * 10)
-  : 0
+    ? Math.round((reviews!.reduce((sum, r) => sum + (r.reliability_rating || r.rating * 2), 0) / totalReviews) * 10)
+    : 0
 
-  const StarRating = ({ rating }: { rating: number }) => (
+  const StarRow = ({ rating }: { rating: number }) => (
     <div style={{ display: 'flex', gap: '3px' }}>
-      {[1, 2, 3, 4, 5].map(s => (
-        <div key={s} style={{
-          width: '12px', height: '12px', borderRadius: '3px',
-          backgroundColor: s <= rating ? '#f59e0b' : '#e2e8f0'
-        }} />
+      {[1,2,3,4,5].map(s => (
+        <div key={s} style={{ width: '11px', height: '11px', borderRadius: '3px', background: s <= rating ? 'linear-gradient(135deg, var(--au-dark), var(--au-mid))' : 'var(--bg-hover)', border: s <= rating ? 'none' : '1px solid var(--border-sub)' }} />
       ))}
     </div>
   )
@@ -63,227 +53,185 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   return (
     <>
       <style>{`
-        .profile-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 0 0 32px; }
-        .profile-content { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        @media (max-width: 768px) {
-          .profile-stats { grid-template-columns: 1fr; }
-          .profile-content { grid-template-columns: 1fr; }
+        .prof { min-height: 100vh; background: var(--bg-void); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        .prof-banner {
+          position: relative; overflow: hidden;
+          padding: 64px 28px 110px;
+          background: linear-gradient(150deg, #060E09 0%, #0A2018 35%, #0D1A0F 60%, #0C0D10 100%);
+          border-bottom: 1px solid rgba(34,168,118,0.08);
+          text-align: center;
         }
+        .prof-banner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(34,168,118,0.07), transparent 60%); pointer-events: none; }
+        .prof-banner::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent); }
+        .prof-avatar {
+          width: 84px; height: 84px;
+          background: linear-gradient(135deg, var(--g-dark), var(--g-rich), var(--g-vivid));
+          border: 2px solid rgba(34,168,118,0.3);
+          border-radius: 24px; margin: 0 auto 18px;
+          display: flex; align-items: center; justify-content: center;
+          color: #22A876; font-weight: 900; font-size: 34px;
+          box-shadow: 0 0 32px rgba(34,168,118,0.2), var(--shadow-xl);
+          position: relative;
+        }
+        .prof-avatar::after { content: ''; position: absolute; inset: -4px; border-radius: 28px; border: 1px solid rgba(34,168,118,0.12); pointer-events: none; }
+        .prof-inner { max-width: 1100px; margin: 0 auto; padding: 0 28px 60px; }
+        .prof-stats {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          gap: 0; margin-top: -60px; margin-bottom: 28px;
+          background: var(--bg-card); border: 1px solid var(--border-mid);
+          border-radius: 20px; overflow: hidden;
+          box-shadow: var(--shadow-xl);
+          position: relative; z-index: 1;
+        }
+        .prof-stat { padding: 26px 20px; text-align: center; transition: background 0.2s; border-right: 1px solid var(--border-sub); }
+        .prof-stat:last-child { border-right: none; }
+        .prof-stat:hover { background: var(--bg-hover); }
+        .prof-content { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .prof-section { background: var(--bg-card); border: 1px solid var(--border-sub); border-radius: 22px; padding: 26px; box-shadow: var(--shadow-md); }
+        .prof-section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border-sub); }
+        .prof-section-bar { width: 3px; height: 20px; border-radius: 999px; flex-shrink: 0; }
+        .prof-review-card { background: var(--bg-raised); border: 1px solid var(--border-sub); border-radius: 14px; padding: 16px; margin-bottom: 10px; transition: border-color 0.2s; }
+        .prof-review-card:hover { border-color: rgba(201,168,76,0.15); }
+        .prof-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--bg-raised); border: 1px solid var(--border-sub); border-radius: 12px; margin-bottom: 8px; text-decoration: none; transition: all 0.2s; }
+        .prof-item-row:hover { border-color: rgba(34,168,118,0.2); background: var(--bg-hover); }
+        .prof-progress-track { height: 5px; background: var(--bg-raised); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+        @media (max-width: 800px) { .prof-content { grid-template-columns: 1fr; } .prof-banner { padding: 52px 20px 96px; } }
+        @media (max-width: 560px) { .prof-stats { grid-template-columns: 1fr; } .prof-stat { border-right: none; border-bottom: 1px solid var(--border-sub); } .prof-stat:last-child { border-bottom: none; } }
       `}</style>
 
-      <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
-
-        {/* Profile Banner */}
-        <div style={{
-          background: 'linear-gradient(135deg, #1a3a5c 0%, #26619C 100%)',
-          padding: '60px 24px 100px', textAlign: 'center'
-        }}>
-          <div style={{
-            width: '80px', height: '80px',
-            background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
-            borderRadius: '22px', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', color: '#ffffff', fontWeight: '800',
-            fontSize: '32px', margin: '0 auto 20px',
-            boxShadow: '0 8px 24px rgba(59,130,246,0.4)'
-          }}>
-            {profile.full_name?.charAt(0).toUpperCase()}
+      <div className="prof">
+        {/* Banner */}
+        <div className="prof-banner">
+          <div style={{ position: 'relative' }}>
+            <div className="prof-avatar">{profile.full_name?.charAt(0).toUpperCase()}</div>
+            <h1 style={{ fontSize: 'clamp(22px,4vw,34px)', fontWeight: '900', color: 'var(--tx-bright)', margin: '0 0 6px', letterSpacing: '-0.04em' }}>{profile.full_name}</h1>
+            <p style={{ fontSize: '13px', color: 'var(--tx-muted)', marginBottom: '18px' }}>
+              College Student · Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </p>
+            {trustScore > 0 && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '7px 18px', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '999px', boxShadow: '0 0 16px rgba(201,168,76,0.1)' }}>
+                <Star size={13} fill="#C9A84C" color="#C9A84C" />
+                <span style={{ fontSize: '13px', fontWeight: '800', color: 'var(--au-light)', letterSpacing: '0.02em' }}>{trustScore} · {trustConfig.label}</span>
+              </div>
+            )}
           </div>
-
-          <h1 style={{ fontSize: '32px', fontWeight: '800', color: '#ffffff', margin: '0 0 8px', letterSpacing: '-0.02em' }}>
-            {profile.full_name}
-          </h1>
-          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.55)', margin: '0 0 20px' }}>
-            Gordon College · Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-          </p>
-
-          {trustScore > 0 && (
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: '8px',
-              backgroundColor: trustConfig.bg, border: `1px solid ${trustConfig.border}`,
-              borderRadius: '999px', padding: '8px 20px'
-            }}>
-              <span style={{ fontSize: '16px', color: '#f59e0b' }}>★</span>
-              <span style={{ fontSize: '14px', fontWeight: '700', color: trustConfig.color }}>
-                {trustScore} · {trustConfig.label}
-              </span>
-            </div>
-          )}
         </div>
 
-        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 24px 48px' }}>
-
-          {/* Stats Row — overlaps banner */}
-          <div className="profile-stats" style={{ marginTop: '-60px', marginBottom: '32px' }}>
+        <div className="prof-inner">
+          {/* Stats */}
+          <div className="prof-stats">
             {[
-              { label: 'Trust Score', value: trustScore || '--', color: '#d97706' },
-              { label: 'Total Reviews', value: totalReviews, color: '#26619C' },
-              { label: 'Items Listed', value: itemsListed, color: '#7c3aed' },
+              { label: 'Trust Score',  value: trustScore || '--', color: '#E2C07A' },
+              { label: 'Total Reviews', value: totalReviews,       color: '#2ECC8F' },
+              { label: 'Items Listed', value: itemsListed,         color: '#C4B5FD' },
             ].map((stat, i) => (
-              <div key={i} style={{
-                backgroundColor: '#ffffff',
-                borderTop: i > 0 ? 'none' : undefined,
-                borderLeft: i > 0 ? 'none' : undefined,
-                border: '1px solid #e8edf2',
-                borderRadius: i === 0 ? '16px 0 0 16px' : i === 2 ? '0 16px 16px 0' : '0',
-                padding: '28px', textAlign: 'center',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
-              }}>
-                <p style={{ fontSize: '11px', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px' }}>
-                  {stat.label}
-                </p>
-                <p style={{ fontSize: '40px', fontWeight: '800', color: stat.color, margin: 0, lineHeight: 1 }}>
-                  {stat.value}
-                </p>
+              <div key={i} className="prof-stat">
+                <p style={{ fontSize: '10px', color: 'var(--tx-muted)', fontWeight: '800', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>{stat.label}</p>
+                <p style={{ fontSize: '38px', fontWeight: '900', color: stat.color, margin: 0, letterSpacing: '-0.05em', lineHeight: 1 }}>{stat.value}</p>
               </div>
             ))}
           </div>
 
-          {/* Main Content */}
-          <div className="profile-content">
+          {/* Content */}
+          <div className="prof-content">
 
-            {/* Left — Reviews */}
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e8edf2', padding: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <div style={{ width: '4px', height: '22px', backgroundColor: '#26619C', borderRadius: '999px' }} />
-                <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-                  Reviews {totalReviews > 0 && <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: '400' }}>({totalReviews})</span>}
-                </h2>
+            {/* Reviews */}
+            <div className="prof-section">
+              <div className="prof-section-head">
+                <div className="prof-section-bar" style={{ background: 'var(--au-mid)', boxShadow: '0 0 8px rgba(201,168,76,0.4)' }} />
+                <h2 style={{ fontSize: '16px', fontWeight: '800', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Reviews</h2>
+                {totalReviews > 0 && (
+                  <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--au-light)', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.2)', padding: '3px 10px', borderRadius: '999px', marginLeft: 'auto' }}>
+                    {totalReviews}
+                  </span>
+                )}
               </div>
-
               {reviews && reviews.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {reviews.map((review: any) => (
-                    <div key={review.id} style={{
-                      backgroundColor: '#fafbfc', borderRadius: '14px',
-                      border: '1px solid #f1f5f9', padding: '16px 18px'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <p style={{ fontWeight: '700', fontSize: '14px', color: '#0f172a', margin: 0 }}>
-                          {review.reviewer?.full_name}
-                        </p>
-                        <StarRating rating={review.rating} />
-                      </div>
-                      {review.comment && (
-                        <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 8px', lineHeight: '1.6' }}>
-                          {review.comment}
-                        </p>
-                      )}
-                      <p style={{ fontSize: '11px', color: '#94a3b8', margin: 0 }}>
-                        {new Date(review.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                      </p>
+                reviews.map((review: any) => (
+                  <div key={review.id} className="prof-review-card">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <p style={{ fontWeight: '800', fontSize: '13px', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.01em' }}>{review.reviewer?.full_name}</p>
+                      <StarRow rating={review.rating} />
                     </div>
-                  ))}
-                </div>
+                    {review.comment && <p style={{ fontSize: '13px', color: 'var(--tx-muted)', margin: '0 0 8px', lineHeight: '1.6' }}>{review.comment}</p>}
+                    <p style={{ fontSize: '11px', color: 'var(--tx-dim)', margin: 0, fontWeight: '600' }}>{new Date(review.created_at).toLocaleDateString()}</p>
+                  </div>
+                ))
               ) : (
                 <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                  <p style={{ fontSize: '32px', marginBottom: '10px' }}>⭐</p>
-                  <p style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px' }}>No reviews yet</p>
-                  <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>Reviews appear after completed rentals</p>
+                  <p style={{ fontSize: '28px', marginBottom: '10px' }}>⭐</p>
+                  <p style={{ fontWeight: '700', color: 'var(--tx-muted)', fontSize: '14px', margin: 0 }}>No reviews yet</p>
                 </div>
               )}
             </div>
 
-            {/* Right — Listed Items + Trust Breakdown */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Items + Trust Breakdown */}
+            <div style={{ display: 'flex', flexDirection: 'column' as const, gap: '16px' }}>
 
               {/* Listed Items */}
-              <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e8edf2', padding: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                  <div style={{ width: '4px', height: '22px', backgroundColor: '#7c3aed', borderRadius: '999px' }} />
-                  <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-                    Listed Items {itemsListed > 0 && <span style={{ fontSize: '14px', color: '#94a3b8', fontWeight: '400' }}>({itemsListed})</span>}
-                  </h2>
+              <div className="prof-section">
+                <div className="prof-section-head">
+                  <div className="prof-section-bar" style={{ background: '#2ECC8F', boxShadow: '0 0 8px rgba(34,168,118,0.4)' }} />
+                  <h2 style={{ fontSize: '16px', fontWeight: '800', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Listed Items</h2>
+                  {itemsListed > 0 && (
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: '#2ECC8F', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.2)', padding: '3px 10px', borderRadius: '999px', marginLeft: 'auto' }}>
+                      {itemsListed}
+                    </span>
+                  )}
                 </div>
-
                 {items && items.length > 0 ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {items.map((item: any) => (
-                      <Link key={item.id} href={`/items/${item.id}`} style={{ textDecoration: 'none' }}>
-                        <div style={{
-                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                          padding: '14px 16px', backgroundColor: '#fafbfc',
-                          borderRadius: '12px', border: '1px solid #f1f5f9',
-                          transition: 'all 0.15s'
-                        }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <div style={{
-                              width: '36px', height: '36px', backgroundColor: '#eff6ff',
-                              borderRadius: '10px', display: 'flex', alignItems: 'center',
-                              justifyContent: 'center', fontSize: '18px', flexShrink: 0
-                            }}>
-                              {item.categories?.icon || '📦'}
-                            </div>
-                            <p style={{ fontWeight: '600', fontSize: '14px', color: '#0f172a', margin: 0 }}>
-                              {item.title}
-                            </p>
-                          </div>
-                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                            <span style={{ fontSize: '15px', fontWeight: '800', color: '#26619C' }}>₱{item.price_per_day}</span>
-                            <span style={{ fontSize: '11px', color: '#94a3b8' }}>/day</span>
-                          </div>
+                  items.map((item: any) => (
+                    <Link key={item.id} href={`/items/${item.id}`} className="prof-item-row">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ width: '34px', height: '34px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <CategoryIcon name={item.categories?.name || 'Other'} size={17} color="#22A876" />
                         </div>
-                      </Link>
-                    ))}
-                  </div>
+                        <p style={{ fontWeight: '700', fontSize: '13px', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.01em' }}>{item.title}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' as const }}>
+                        <span style={{ fontSize: '14px', fontWeight: '900', color: '#2ECC8F', letterSpacing: '-0.02em' }}>₱{item.price_per_day}</span>
+                        <span style={{ fontSize: '10px', color: 'var(--tx-muted)' }}>/day</span>
+                      </div>
+                    </Link>
+                  ))
                 ) : (
-                  <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                    <p style={{ fontSize: '32px', marginBottom: '10px' }}>📦</p>
-                    <p style={{ fontWeight: '600', color: '#0f172a', marginBottom: '4px' }}>No items listed</p>
-                    <p style={{ fontSize: '13px', color: '#94a3b8', margin: 0 }}>This user hasn't listed any items yet</p>
+                  <div style={{ textAlign: 'center', padding: '32px 20px' }}>
+                    <p style={{ fontWeight: '700', color: 'var(--tx-muted)', fontSize: '13px', margin: 0 }}>No items listed</p>
                   </div>
                 )}
               </div>
 
-              {/* Trust Score Breakdown */}
+              {/* Trust Breakdown */}
               {totalReviews > 0 && (
-                <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e8edf2', padding: '28px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                  <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', margin: '0 0 20px' }}>
-                    Trust Score Breakdown
-                  </h2>
-
+                <div className="prof-section">
+                  <div className="prof-section-head">
+                    <div className="prof-section-bar" style={{ background: 'var(--au-mid)', boxShadow: '0 0 8px rgba(201,168,76,0.4)' }} />
+                    <h2 style={{ fontSize: '16px', fontWeight: '800', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Trust Breakdown</h2>
+                  </div>
                   {[
-                    { label: 'Communication', value: commScore, color: '#10b981' },
-                    { label: 'Item Quality', value: qualScore, color: '#26619C' },
-                    { label: 'Reliability', value: relScore, color: '#f59e0b' },
+                    { label: 'Communication', value: commScore, color: '#2ECC8F', gradient: 'linear-gradient(90deg, #22A876, #2ECC8F)' },
+                    { label: 'Item Quality',  value: qualScore, color: '#93C5FD', gradient: 'linear-gradient(90deg, #3B82F6, #93C5FD)' },
+                    { label: 'Reliability',   value: relScore,  color: '#E2C07A', gradient: 'linear-gradient(90deg, var(--au-dark), var(--au-mid))' },
                   ].map((item, i) => (
-                    <div key={i} style={{ marginBottom: i < 2 ? '18px' : 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                        <p style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', margin: 0 }}>{item.label}</p>
-                        <p style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a', margin: 0 }}>{item.value}%</p>
+                    <div key={i} style={{ marginBottom: i < 2 ? '16px' : 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <p style={{ fontSize: '12px', fontWeight: '700', color: 'var(--tx-muted)', margin: 0, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{item.label}</p>
+                        <p style={{ fontSize: '13px', fontWeight: '800', color: item.color, margin: 0 }}>{item.value}%</p>
                       </div>
-                      <div style={{ height: '8px', backgroundColor: '#f1f5f9', borderRadius: '999px', overflow: 'hidden' }}>
-                        <div style={{
-                          height: '100%', width: `${item.value}%`,
-                          backgroundColor: item.color,
-                          borderRadius: '999px',
-                          transition: 'width 0.6s ease'
-                        }} />
+                      <div className="prof-progress-track">
+                        <div style={{ height: '100%', width: `${item.value}%`, background: item.gradient, borderRadius: '999px', boxShadow: `0 0 8px ${item.color}40`, transition: 'width 0.6s ease' }} />
                       </div>
                     </div>
                   ))}
-
-                  {/* Overall score */}
-                  <div style={{
-                    marginTop: '20px', paddingTop: '20px',
-                    borderTop: '1px solid #f1f5f9',
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                  }}>
-                    <p style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', margin: 0 }}>Overall Trust Score</p>
+                  <div style={{ marginTop: '18px', paddingTop: '18px', borderTop: '1px solid var(--border-sub)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p style={{ fontSize: '12px', fontWeight: '700', color: 'var(--tx-muted)', margin: 0, textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>Overall</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ display: 'flex', gap: '3px' }}>
-                        {[1, 2, 3, 4, 5].map(s => (
-                          <div key={s} style={{
-                            width: '14px', height: '14px', borderRadius: '4px',
-                            backgroundColor: s <= Math.round(trustScore) ? '#f59e0b' : '#e2e8f0'
-                          }} />
-                        ))}
-                      </div>
-                      <span style={{ fontSize: '16px', fontWeight: '800', color: '#d97706' }}>{trustScore}</span>
+                      <StarRow rating={Math.round(trustScore)} />
+                      <span style={{ fontSize: '16px', fontWeight: '900', color: '#E2C07A', letterSpacing: '-0.03em' }}>{trustScore}</span>
                     </div>
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>
