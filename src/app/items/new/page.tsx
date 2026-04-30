@@ -65,138 +65,190 @@ export default function NewItemPage() {
     router.refresh()
   }
 
-  const inputStyle = {
-    width: '100%', padding: '13px 16px', backgroundColor: '#ffffff',
-    border: '1.5px solid #e2e8f0', borderRadius: '12px',
-    fontSize: '14px', color: '#0f172a', outline: 'none',
-    boxSizing: 'border-box' as const
-  }
-
   const conditionOptions = [
-    { value: 'new',      label: 'New',      icon: <Sparkles size={16} color="#16a34a" strokeWidth={2} />,  activeColor: '#16a34a', activeBg: '#f0fdf4', activeBorder: '#86efac' },
-    { value: 'like_new', label: 'Like New', icon: <Star size={16} color="#2563eb" strokeWidth={2} />,      activeColor: '#2563eb', activeBg: '#eff6ff', activeBorder: '#bfdbfe' },
-    { value: 'good',     label: 'Good',     icon: <ThumbsUp size={16} color="#d97706" strokeWidth={2} />,  activeColor: '#d97706', activeBg: '#fffbeb', activeBorder: '#fde68a' },
-    { value: 'fair',     label: 'Fair',     icon: <Wrench size={16} color="#ea580c" strokeWidth={2} />,    activeColor: '#ea580c', activeBg: '#fff7ed', activeBorder: '#fed7aa' },
+    { value: 'new',      label: 'New',      icon: <Sparkles size={16} />, color: '#2ECC8F', bg: 'var(--g-glow)' },
+    { value: 'like_new', label: 'Like New', icon: <Star size={16} />,     color: '#93C5FD', bg: 'rgba(59,130,246,0.1)' },
+    { value: 'good',     label: 'Good',     icon: <ThumbsUp size={16} />, color: '#E2C07A', bg: 'var(--au-glow)' },
+    { value: 'fair',     label: 'Fair',     icon: <Wrench size={16} />,   color: '#FDBA74', bg: 'rgba(251,146,60,0.1)' },
   ]
 
   return (
     <>
       <style>{`
-        .new-item-form { display: flex; flex-direction: column; gap: 16px; }
-        .price-loc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .condition-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        @media (max-width: 480px) {
-          .price-loc-grid { grid-template-columns: 1fr; }
-          .condition-grid { grid-template-columns: repeat(2, 1fr); }
+        .new-page { min-height: 100vh; background: var(--bg-void); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        
+        .new-banner {
+          position: relative; overflow: hidden;
+          padding: 40px 28px 52px;
+          background: linear-gradient(150deg, #060E09 0%, #0A2018 40%, #0C0D10 100%);
+          border-bottom: 1px solid rgba(34,168,118,0.08);
+        }
+        .new-banner::after {
+          content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(201,168,76,0.12), transparent);
+        }
+
+        .new-inner { max-width: 680px; margin: 0 auto; padding: 32px 28px 60px; }
+
+        .new-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-sub);
+          border-radius: 20px; padding: 28px;
+          box-shadow: var(--shadow-sm);
+          margin-bottom: 24px;
+        }
+
+        .new-label {
+          display: block; font-size: 11px; font-weight: 800; color: var(--tx-muted);
+          text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px;
+        }
+
+        .new-input, .new-select, .new-textarea {
+          width: 100%; padding: 14px 16px;
+          background: var(--bg-raised); border: 1px solid var(--border-sub);
+          border-radius: 12px; color: var(--tx-bright); font-size: 14px;
+          font-family: inherit; outline: none; transition: all 0.2s;
+          box-sizing: border-box;
+        }
+        .new-input:focus, .new-select:focus, .new-textarea:focus {
+          border-color: #22A876; background: rgba(34,168,118,0.02);
+          box-shadow: 0 0 0 3px rgba(34,168,118,0.1);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+        .upload-area {
+          border: 2px dashed var(--border-mid); border-radius: 14px; padding: 28px 20px;
+          text-align: center; cursor: pointer; background: var(--bg-raised);
+          position: relative; transition: all 0.2s;
+        }
+        .upload-area:hover { border-color: rgba(34,168,118,0.4); background: rgba(34,168,118,0.02); }
+
+        .condition-btn {
+          padding: 14px 8px; border-radius: 12px; cursor: pointer;
+          border: 1px solid var(--border-sub); background: var(--bg-raised);
+          display: flex; flex-direction: column; align-items: center; gap: 8px;
+          transition: all 0.2s;
+        }
+
+        .price-preview {
+          background: linear-gradient(135deg, var(--au-deep), rgba(42,30,8,0.4));
+          border: 1px solid rgba(201,168,76,0.2); border-radius: 18px; padding: 24px;
+          margin-bottom: 24px;
+        }
+
+        .btn-submit {
+          width: 100%; padding: 18px; border-radius: 14px; font-weight: 800; font-size: 16px;
+          background: linear-gradient(135deg, var(--g-mid), var(--g-vivid));
+          border: 1px solid rgba(34,168,118,0.3); color: var(--g-neon);
+          cursor: pointer; transition: all 0.25s; display: flex; align-items: center; justify-content: center; gap: 10px;
+          box-shadow: 0 4px 20px rgba(15,61,42,0.4);
+        }
+        .btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(15,61,42,0.6); }
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .error-box {
+          background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+          border-radius: 12px; padding: 14px 16px; color: #FCA5A5;
+          font-size: 13px; font-weight: 600; margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+          .grid-2 { grid-template-columns: 1fr; }
+          .grid-4 { grid-template-columns: repeat(2, 1fr); }
+          .new-inner { padding: 24px 20px 48px; }
+          .new-card { padding: 20px; }
         }
       `}</style>
 
-      <div style={{ minHeight: '100vh', backgroundColor: '#f0f4f8', fontFamily: 'system-ui, sans-serif' }}>
-
+      <div className="new-page">
         {/* Banner */}
-        <div style={{ background: 'linear-gradient(135deg, #1a3a5c 0%, #26619C 100%)', padding: '40px 24px' }}>
-          <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Link href="/items" style={{
-              width: '38px', height: '38px', backgroundColor: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.2)', borderRadius: '10px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#ffffff', textDecoration: 'none', flexShrink: 0
-            }}>
-              <ArrowLeft size={18} strokeWidth={2} />
+        <div className="new-banner">
+          <div style={{ maxWidth: '680px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
+            <Link href="/items" style={{ width: '38px', height: '38px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-mid)', borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tx-body)', textDecoration: 'none', flexShrink: 0, transition: 'all 0.2s' }}>
+              <ArrowLeft size={17} strokeWidth={2} />
             </Link>
             <div>
-              <p style={{ fontSize: '12px', fontWeight: '600', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>Marketplace</p>
-              <h1 style={{ fontSize: 'clamp(22px, 5vw, 28px)', fontWeight: '800', color: '#ffffff', margin: 0 }}>List an Item</h1>
+              <p style={{ fontSize: '11px', fontWeight: '800', color: '#22A876', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '4px' }}>Marketplace</p>
+              <h1 style={{ fontSize: 'clamp(24px,5vw,32px)', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.03em' }}>List an Item</h1>
             </div>
           </div>
         </div>
 
-        <div style={{ maxWidth: '680px', margin: '0 auto', padding: '28px 24px' }}>
-          {error && (
-            <div style={{ marginBottom: '16px', padding: '14px 16px', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', color: '#dc2626', fontSize: '14px' }}>
-              {error}
-            </div>
-          )}
+        <div className="new-inner">
+          {error && <div className="error-box">{error}</div>}
 
-          <form onSubmit={handleSubmit} className="new-item-form">
-
+          <form onSubmit={handleSubmit}>
+            
             {/* Image Upload */}
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e8edf2', padding: '22px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '12px' }}>Item Photo</label>
-              <div style={{
-                border: '2px dashed #cbd5e1', borderRadius: '14px', padding: '20px',
-                textAlign: 'center', cursor: 'pointer', backgroundColor: '#f8fafc', position: 'relative'
-              }}>
+            <div className="new-card">
+              <label className="new-label">Item Photo</label>
+              <div className="upload-area">
                 {imagePreview ? (
-                  <img src={imagePreview} alt="Preview" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '10px', marginBottom: '10px' }} />
+                  <img src={imagePreview} alt="Preview" style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }} />
                 ) : (
-                  <div style={{ padding: '28px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '52px', height: '52px', backgroundColor: '#eff6ff', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Camera size={24} color="#26619C" strokeWidth={1.8} />
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '56px', height: '56px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.15)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2ECC8F' }}>
+                      <Camera size={26} strokeWidth={2} />
                     </div>
                     <div>
-                      <p style={{ fontSize: '14px', color: '#374151', margin: '0 0 4px', fontWeight: '600' }}>Upload a photo</p>
-                      <p style={{ fontSize: '12px', color: '#94a3b8', margin: 0 }}>PNG, JPG up to 10MB</p>
+                      <p style={{ fontSize: '15px', color: 'var(--tx-bright)', margin: '0 0 4px', fontWeight: '800' }}>Upload a photo</p>
+                      <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0, fontWeight: '600' }}>PNG, JPG up to 10MB</p>
                     </div>
                   </div>
                 )}
-                <input type="file" accept="image/*" onChange={handleImageChange}
-                  style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
+                <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
               </div>
             </div>
 
             {/* Details */}
-            <div style={{ backgroundColor: '#ffffff', borderRadius: '20px', border: '1px solid #e8edf2', padding: '22px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Item Title *</label>
-                <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Scientific Calculator Casio fx-991" style={inputStyle} />
+            <div className="new-card">
+              <div className="form-group">
+                <label className="new-label">Item Title *</label>
+                <input type="text" className="new-input" value={title} onChange={(e) => setTitle(e.target.value)} required placeholder="e.g. Scientific Calculator Casio fx-991" />
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Description</label>
-                <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
-                  placeholder="Describe your item..."
-                  style={{ ...inputStyle, resize: 'none' as const, lineHeight: '1.6' }} />
+              <div className="form-group">
+                <label className="new-label">Description</label>
+                <textarea className="new-textarea" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Describe your item..." style={{ resize: 'vertical' }} />
               </div>
 
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Category</label>
-                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)} style={inputStyle}>
-                  <option value="">Select a category</option>
+              <div className="form-group">
+                <label className="new-label">Category</label>
+                <select className="new-select" value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+                  <option value="" disabled>Select a category</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
               </div>
 
-              <div className="price-loc-grid" style={{ marginBottom: '16px' }}>
+              <div className="form-group grid-2">
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Price per Day (₱) *</label>
-                  <input type="number" value={pricePerDay} onChange={(e) => setPricePerDay(e.target.value)} required min="1" placeholder="e.g. 50" style={inputStyle} />
+                  <label className="new-label">Price per Day (₱) *</label>
+                  <input type="number" className="new-input" value={pricePerDay} onChange={(e) => setPricePerDay(e.target.value)} required min="1" placeholder="e.g. 50" />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>Location</label>
-                  <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Engineering Bldg" style={inputStyle} />
+                  <label className="new-label">Location</label>
+                  <input type="text" className="new-input" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Engineering Bldg" />
                 </div>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '10px' }}>Condition</label>
-                <div className="condition-grid">
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="new-label">Condition</label>
+                <div className="grid-4">
                   {conditionOptions.map((opt) => {
                     const isActive = condition === opt.value
                     return (
-                      <button key={opt.value} type="button" onClick={() => setCondition(opt.value)} style={{
-                        padding: '12px 8px', borderRadius: '12px', cursor: 'pointer',
-                        border: `2px solid ${isActive ? opt.activeBorder : '#e2e8f0'}`,
-                        backgroundColor: isActive ? opt.activeBg : '#f8fafc',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
-                        transition: 'all 0.15s'
+                      <button key={opt.value} type="button" className="condition-btn" onClick={() => setCondition(opt.value)} style={{
+                        borderColor: isActive ? opt.color : 'var(--border-sub)',
+                        backgroundColor: isActive ? opt.bg : 'var(--bg-raised)',
+                        color: isActive ? opt.color : 'var(--tx-muted)'
                       }}>
                         {opt.icon}
-                        <span style={{ fontSize: '12px', fontWeight: '600', color: isActive ? opt.activeColor : '#64748b' }}>
-                          {opt.label}
-                        </span>
+                        <span style={{ fontSize: '12px', fontWeight: '700' }}>{opt.label}</span>
                       </button>
                     )
                   })}
@@ -205,49 +257,26 @@ export default function NewItemPage() {
             </div>
 
             {/* Price Preview */}
-            <div style={{
-              background: 'linear-gradient(135deg, #1a3a5c, #26619C)',
-              borderRadius: '16px', padding: '24px',
-              boxShadow: '0 4px 16px rgba(26,58,92,0.25)'
-            }}>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: '0 0 16px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-                Price Preview
-              </p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+            <div className="price-preview">
+              <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: '0 0 16px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Price Preview</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
                 {[{ days: 1, label: '1 day' }, { days: 3, label: '3 days' }, { days: 7, label: '7 days' }].map(({ days, label }) => {
-                  const price = pricePerDay && parseFloat(pricePerDay) > 0
-                    ? (parseFloat(pricePerDay) * days).toFixed(0) : '--'
+                  const price = pricePerDay && parseFloat(pricePerDay) > 0 ? (parseFloat(pricePerDay) * days).toFixed(0) : '--'
                   return (
-                    <div key={days} style={{
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      border: '1px solid rgba(255,255,255,0.15)',
-                      borderRadius: '12px', padding: '14px', textAlign: 'center'
-                    }}>
-                      <p style={{ fontSize: '22px', fontWeight: '800', color: '#ffffff', margin: '0 0 4px', lineHeight: 1 }}>
+                    <div key={days} style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(201,168,76,0.1)', borderRadius: '12px', padding: '16px 12px', textAlign: 'center' }}>
+                      <p className="gold-shimmer" style={{ fontSize: '24px', fontWeight: '900', margin: '0 0 4px', lineHeight: 1, letterSpacing: '-0.03em' }}>
                         {price !== '--' ? `₱${price}` : '--'}
                       </p>
-                      <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0, fontWeight: '600' }}>{label}</p>
+                      <p style={{ fontSize: '11px', color: 'var(--tx-dim)', margin: 0, fontWeight: '700' }}>{label}</p>
                     </div>
                   )
                 })}
               </div>
-              {(!pricePerDay || parseFloat(pricePerDay) <= 0) && (
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', margin: '12px 0 0', textAlign: 'center' }}>
-                  Enter a price above to see the preview
-                </p>
-              )}
             </div>
 
             {/* Submit */}
-            <button type="submit" disabled={loading} style={{
-              width: '100%', padding: '16px',
-              background: loading ? '#94a3b8' : 'linear-gradient(135deg, #1a3a5c, #26619C)',
-              color: '#ffffff', fontWeight: '700', borderRadius: '14px',
-              border: 'none', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 16px rgba(26,58,92,0.3)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
-            }}>
-              <ImagePlus size={20} strokeWidth={2} />
+            <button type="submit" className="btn-submit" disabled={loading}>
+              <ImagePlus size={20} strokeWidth={2.5} />
               {loading ? 'Listing item...' : 'List Item'}
             </button>
 
