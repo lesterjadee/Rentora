@@ -3,7 +3,8 @@ import Link from 'next/link'
 import {
   ShieldCheck, Star, Bell, Sparkles,
   Camera, CalendarCheck, ArrowRight,
-  Users, Package, TrendingUp, ChevronRight
+  Users, Package, TrendingUp, ChevronRight,
+  FlaskConical, CheckCircle2
 } from 'lucide-react'
 
 export default async function Home() {
@@ -104,7 +105,7 @@ export default async function Home() {
           border: 1px solid var(--border-sub);
           border-radius: 16px; height: 170px;
           display: flex; align-items: center; justify-content: center;
-          font-size: 60px; margin-bottom: 20px;
+          margin-bottom: 20px;
           position: relative; overflow: hidden;
         }
         .hp-item-img::after {
@@ -122,7 +123,6 @@ export default async function Home() {
           z-index: 10;
         }
         .hp-section { padding: 100px 28px; max-width: 1280px; margin: 0 auto; }
-        .hp-section-sm { padding: 80px 28px; }
         .hp-eyebrow { font-size: 11px; font-weight: 800; color: var(--g-bright); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .hp-eyebrow::before { content: ''; width: 20px; height: 2px; background: var(--g-bright); border-radius: 1px; }
         .hp-section-title { font-size: clamp(30px,4.5vw,50px); font-weight: 900; color: var(--tx-bright); letter-spacing: -0.04em; line-height: 1.08; margin-bottom: 16px; }
@@ -174,7 +174,7 @@ export default async function Home() {
         .hp-step {
           padding: 40px 36px;
           border-right: 1px solid var(--border-sub);
-          position: relative;
+          position: relative; transition: background 0.2s;
         }
         .hp-step:last-child { border-right: none; }
         .hp-step:hover { background: var(--bg-raised); }
@@ -192,7 +192,6 @@ export default async function Home() {
           top: 0; left: 0; right: 0; height: 1px;
           background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
         }
-        .hp-progress-bar { height: 5px; background: var(--bg-raised); border-radius: 999px; overflow: hidden; margin-top: 8px; }
         .hp-cta-section {
           position: relative; overflow: hidden;
           margin: 0 28px 80px;
@@ -225,8 +224,8 @@ export default async function Home() {
           .hp-hero-grid { grid-template-columns: 1fr; gap: 60px; }
           .hp-trust-grid { grid-template-columns: 1fr; gap: 48px; }
         }
+        @media (max-width: 900px) { .hp-features-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 768px) {
-          .hp-features-grid { grid-template-columns: 1fr 1fr; }
           .hp-steps-grid { grid-template-columns: 1fr; }
           .hp-step { border-right: none; border-bottom: 1px solid var(--border-sub); }
           .hp-step:last-child { border-bottom: none; }
@@ -275,6 +274,7 @@ export default async function Home() {
                   </>
                 )}
               </div>
+
               <div className="hp-stats-row">
                 {[
                   { icon: <Package size={14} color="#22A876" />, value: itemCount ?? 0, label: 'Items available' },
@@ -290,6 +290,7 @@ export default async function Home() {
               </div>
             </div>
 
+            {/* Hero Card */}
             <div className="animate-fade-up-delay" style={{ display: 'flex', justifyContent: 'center' }}>
               <div style={{ position: 'relative', width: '100%', maxWidth: '360px' }}>
                 <div className="hp-hero-card">
@@ -298,7 +299,14 @@ export default async function Home() {
                     <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Featured Item</span>
                     <span className="status-available">Available</span>
                   </div>
-                  <div className="hp-item-img">🔬</div>
+
+                  {/* Flask icon replacing 🔬 emoji */}
+                  <div className="hp-item-img">
+                    <div style={{ width: '80px', height: '80px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.2)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+                      <FlaskConical size={44} color="#22A876" strokeWidth={1.4} />
+                    </div>
+                  </div>
+
                   <h3 style={{ fontWeight: '800', fontSize: '16px', color: 'var(--tx-bright)', margin: '0 0 4px', letterSpacing: '-0.02em' }}>Scientific Calculator</h3>
                   <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: '0 0 20px' }}>Casio fx-991EX · Like New</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '18px', borderTop: '1px solid var(--border-sub)' }}>
@@ -312,8 +320,12 @@ export default async function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* Notification popup — CheckCircle2 replacing ✅ emoji */}
                 <div className="hp-notif-pop">
-                  <div style={{ width: '30px', height: '30px', background: 'linear-gradient(135deg, var(--au-deep), rgba(90,63,20,0.5))', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>✅</div>
+                  <div style={{ width: '30px', height: '30px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.25)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckCircle2 size={16} color="#22A876" strokeWidth={2} />
+                  </div>
                   <div>
                     <p style={{ fontSize: '12px', fontWeight: '700', color: 'var(--tx-bright)', margin: 0 }}>Rental Approved!</p>
                     <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: 0 }}>Just now</p>
@@ -343,8 +355,7 @@ export default async function Home() {
               <div className="hp-features-grid">
                 {features.map((f, i) => (
                   <div key={i} className={`hp-feature-card ${f.label}`}>
-                    <div className={f.label === 'gold' ? 'hp-icon-box-gold' : 'hp-icon-box-green'}
-                      style={{ color: f.color }}>
+                    <div className={f.label === 'gold' ? 'hp-icon-box-gold' : 'hp-icon-box-green'} style={{ color: f.color }}>
                       {f.icon}
                     </div>
                     <h3 style={{ fontWeight: '700', fontSize: '14px', color: 'var(--tx-bright)', marginBottom: '8px', letterSpacing: '-0.01em' }}>{f.title}</h3>
@@ -371,7 +382,7 @@ export default async function Home() {
                 { n: '02', color: 'var(--au-mid)', title: 'Browse or list items', desc: 'Find what you need or list your own items to earn from them while they sit unused.' },
                 { n: '03', color: 'var(--g-neon)', title: 'Rent with confidence', desc: 'Request, agree on dates, and transact safely within a community built on trust.' },
               ].map((step, i) => (
-                <div key={i} className="hp-step" style={{ transition: 'background 0.2s' }}>
+                <div key={i} className="hp-step">
                   <div className="hp-step-num" style={{ color: step.color === 'var(--g-neon)' ? 'rgba(46,204,143,0.12)' : 'rgba(201,168,76,0.1)' }}>{step.n}</div>
                   <div style={{ width: '28px', height: '3px', background: step.color, borderRadius: '999px', marginBottom: '18px', boxShadow: `0 0 12px ${step.color === 'var(--g-neon)' ? 'rgba(46,204,143,0.4)' : 'rgba(201,168,76,0.4)'}` }} />
                   <h3 style={{ fontWeight: '800', fontSize: '16px', color: 'var(--tx-bright)', marginBottom: '10px', letterSpacing: '-0.02em' }}>{step.title}</h3>
@@ -488,6 +499,7 @@ export default async function Home() {
             <p style={{ fontSize: '12px', color: 'var(--tx-dim)', margin: 0 }}>© 2026 Rentora · Built for College Students · By Lester Jade Lobos</p>
           </div>
         </footer>
+
       </div>
     </>
   )
