@@ -4,7 +4,7 @@ import {
   ShieldCheck, Star, Bell, Sparkles,
   Camera, CalendarCheck, ArrowRight,
   Users, Package, TrendingUp, ChevronRight,
-  FlaskConical, CheckCircle2
+  Calculator, CheckCircle2
 } from 'lucide-react'
 
 export default async function Home() {
@@ -300,10 +300,10 @@ export default async function Home() {
                     <span className="status-available">Available</span>
                   </div>
 
-                  {/* Flask icon replacing 🔬 emoji */}
+                  {/* Calculator icon replacing 🔬 emoji */}
                   <div className="hp-item-img">
                     <div style={{ width: '80px', height: '80px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.2)', borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
-                      <FlaskConical size={44} color="#22A876" strokeWidth={1.4} />
+                      <Calculator size={44} color="#22A876" strokeWidth={1.4} />
                     </div>
                   </div>
 
