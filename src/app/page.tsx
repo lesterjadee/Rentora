@@ -459,7 +459,88 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        <div className="divider" />
 
+        {/* ── QR CODE ── */}
+        <section style={{ padding: '100px 28px' }}>
+          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+
+              {/* Left — text */}
+              <div>
+                <div className="hp-eyebrow">Access Rentora</div>
+                <h2 className="hp-section-title">
+                  Scan to get<br />
+                  <span className="gold-shimmer">started instantly.</span>
+                </h2>
+                <p className="hp-section-sub" style={{ marginBottom: '32px' }}>
+                  Open your phone camera and point it at the QR code to access Rentora directly — no typing needed. Works on any device with a browser.
+                </p>
+                {[
+                  { step: '01', text: 'Open your phone camera or QR scanner app' },
+                  { step: '02', text: 'Point it at the QR code on the right' },
+                  { step: '03', text: 'Tap the link and you\'re in' },
+                ].map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: i % 2 === 0 ? 'var(--g-glow)' : 'var(--au-glow)', border: `1px solid ${i % 2 === 0 ? 'rgba(34,168,118,0.2)' : 'rgba(201,168,76,0.2)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{ fontSize: '11px', fontWeight: '900', color: i % 2 === 0 ? '#22A876' : '#C9A84C', letterSpacing: '-0.02em' }}>{item.step}</span>
+                    </div>
+                    <p style={{ fontSize: '14px', color: 'var(--tx-body)', margin: 0, fontWeight: '500' }}>{item.text}</p>
+                  </div>
+                ))}
+                <div style={{ marginTop: '28px', padding: '14px 18px', background: 'var(--bg-raised)', border: '1px solid var(--border-sub)', borderRadius: '14px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22A876', boxShadow: '0 0 8px rgba(34,168,118,0.6)', animation: 'breathe 2s ease infinite', flexShrink: 0 }} />
+                  <p style={{ fontSize: '13px', color: 'var(--tx-muted)', margin: 0, fontWeight: '500' }}>
+                    Direct link:{' '}
+                    <a href="https://rentora-tau-flame.vercel.app" target="_blank" rel="noopener noreferrer" style={{ color: '#22A876', fontWeight: '700', textDecoration: 'none', letterSpacing: '-0.01em' }}>
+                      rentora-tau-flame.vercel.app
+                    </a>
+                  </p>
+                </div>
+              </div>
+
+              {/* Right — QR Code card */}
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-mid)', borderRadius: '28px', padding: '40px', boxShadow: 'var(--shadow-xl)', position: 'relative', overflow: 'hidden', textAlign: 'center' as const }}>
+
+                  {/* Top shimmer line */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(201,168,76,0.5), transparent)' }} />
+
+                  <p style={{ fontSize: '11px', fontWeight: '800', color: 'var(--tx-muted)', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '24px' }}>
+                    Scan to Open Rentora
+                  </p>
+
+                  {/* QR Code image via free API */}
+                  <div style={{ background: '#ffffff', borderRadius: '20px', padding: '16px', display: 'inline-block', boxShadow: '0 8px 32px rgba(0,0,0,0.4)', marginBottom: '24px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                    <img
+                      src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://rentora-tau-flame.vercel.app/&color=0D2B1A&bgcolor=ffffff&qzone=1&format=png"
+                      alt="Scan to access Rentora"
+                      width={200}
+                      height={200}
+                      style={{ display: 'block', borderRadius: '8px' }}
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: '20px' }}>
+                    <p style={{ fontSize: '15px', fontWeight: '800', color: 'var(--tx-bright)', margin: '0 0 6px', letterSpacing: '-0.02em' }}>Rentora</p>
+                    <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>Student Item Rental Hub</p>
+                  </div>
+
+                  {/* Gold pulse rings decoration */}
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+                    {[0, 1, 2].map(i => (
+                      <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: i === 1 ? '#C9A84C' : 'var(--border-mid)', boxShadow: i === 1 ? '0 0 8px rgba(201,168,76,0.5)' : 'none' }} />
+                    ))}
+                  </div>
+
+                  {/* Bottom glow */}
+                  <div style={{ position: 'absolute', bottom: '-40px', left: '50%', transform: 'translateX(-50%)', width: '200px', height: '100px', background: 'radial-gradient(ellipse, rgba(201,168,76,0.08), transparent)', pointerEvents: 'none' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
         {/* ── CTA ── */}
         <div className="hp-cta-section">
           <div className="hp-cta-glow" />
