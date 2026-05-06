@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background: deep coal -->
+  <rect width="512" height="512" rx="112" fill="#0C0D10"/>
+  
+  <!-- Subtle green glow layer -->
+  <rect width="512" height="512" rx="112" fill="url(#glow)" opacity="0.6"/>
+  
+  <!-- Top highlight border -->
+  <rect width="510" height="510" x="1" y="1" rx="111" fill="none" stroke="url(#borderGrad)" stroke-width="2"/>
+  
+  <!-- Definitions -->
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#0F3D2A" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#0C0D10" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#22A876" stop-opacity="0.4"/>
+      <stop offset="50%" stop-color="#C9A84C" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#22A876" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="letterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2ECC8F"/>
+      <stop offset="100%" stop-color="#22A876"/>
+    </linearGradient>
+    <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E2C07A"/>
+      <stop offset="100%" stop-color="#C9A84C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Letter R — bold, centered -->
+  <text 
+    x="256" y="330" 
+    font-family="'Arial Black', 'Arial', sans-serif"
+    font-weight="900"
+    font-size="280"
+    text-anchor="middle"
+    fill="url(#letterGrad)"
+    letter-spacing="-8"
+  >R</text>
+
+  <!-- Gold accent dot bottom right -->
+  <circle cx="370" cy="390" r="28" fill="url(#dotGrad)" opacity="0.9"/>
+</svg>

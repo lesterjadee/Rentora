@@ -1,12 +1,12 @@
 {
-  "name": "Rentora — Student Item Rental Hub",
+  "name": "Rentora",
   "short_name": "Rentora",
-  "description": "Rent, lend, and manage academic items with fellow Gordon College students",
+  "description": "Student Item Rental Hub",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f0f4f8",
-  "theme_color": "#1a3a5c",
-  "orientation": "portrait",
+  "background_color": "#0C0D10",
+  "theme_color": "#0F3D2A",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -19,6 +19,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
   ]
 }
