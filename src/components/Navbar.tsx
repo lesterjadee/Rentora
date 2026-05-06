@@ -17,36 +17,70 @@ export default function Navbar() {
   const [notifCount, setNotifCount] = useState(0)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const isAuthPage = pathname.startsWith('/auth')
 
   useEffect(() => {
+    setMounted(true)
+
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+
+    // Get initial session
+    const getInitialUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser(session.user)
+        fetchProfile(session.user.id)
+      }
+    }
+    getInitialUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user)
+          fetchProfile(session.user.id)
+        } else {
+          setUser(null)
+          setProfile(null)
+          setNotifCount(0)
+        }
+      }
+    )
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      subscription.unsubscribe()
+    }
   }, [])
 
+  // Refresh notif count on page change
   useEffect(() => {
-    const fetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      setUser(user)
-      const { data: prof } = await supabase
-        .from('profiles')
-        .select('full_name, trust_score')
-        .eq('id', user.id)
-        .single()
-      setProfile(prof)
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('read', false)
-      setNotifCount(count || 0)
-    }
-    fetchData()
-  }, [pathname])
+    if (user) fetchNotifCount(user.id)
+  }, [pathname, user])
 
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('full_name, trust_score')
+      .eq('id', userId)
+      .single()
+    if (data) setProfile(data)
+  }
+
+  const fetchNotifCount = async (userId: string) => {
+    const { count } = await supabase
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('read', false)
+    setNotifCount(count || 0)
+  }
+
+  if (!mounted) return null
   if (isAuthPage) return null
 
   const navLinks = [
@@ -73,6 +107,7 @@ export default function Navbar() {
         }
         .navbar.scrolled {
           box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+          border-bottom-color: rgba(255,255,255,0.1);
         }
         .navbar-inner {
           max-width: 1280px;
@@ -84,16 +119,9 @@ export default function Navbar() {
           justify-content: space-between;
           gap: 16px;
         }
-
-        /* ── LOGO ── */
         .nav-logo {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          text-decoration: none;
-          flex-shrink: 0;
-          position: relative;
-          z-index: 10;
+          display: flex; align-items: center; gap: 9px;
+          text-decoration: none; flex-shrink: 0; cursor: pointer;
         }
         .nav-logo-mark {
           width: 34px; height: 34px;
@@ -109,51 +137,34 @@ export default function Navbar() {
           box-shadow: 0 0 24px rgba(34,168,118,0.28);
         }
         .nav-logo-text {
-          font-size: 18px;
-          font-weight: 900;
-          letter-spacing: -0.03em;
+          font-size: 18px; font-weight: 900; letter-spacing: -0.03em;
           background: linear-gradient(135deg, #2ECC8F 30%, #4EDDAA 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-
-        /* ── CENTER NAV LINKS ── */
         .nav-links-wrap {
-          display: flex;
-          align-items: center;
-          gap: 2px;
+          display: flex; align-items: center; gap: 2px;
           background: rgba(255,255,255,0.03);
           border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 14px;
-          padding: 4px;
+          border-radius: 14px; padding: 4px;
         }
         .nav-link {
           display: flex; align-items: center; gap: 6px;
           padding: 8px 14px; border-radius: 10px;
           font-size: 13px; font-weight: 600;
-          text-decoration: none;
-          transition: all 0.2s;
-          color: #5E5C56;
-          white-space: nowrap;
+          text-decoration: none; transition: all 0.2s;
+          color: #5E5C56; white-space: nowrap;
           border: 1px solid transparent;
         }
-        .nav-link:hover {
-          color: #A8A59A;
-          background: rgba(255,255,255,0.05);
-        }
+        .nav-link:hover { color: #A8A59A; background: rgba(255,255,255,0.05); }
         .nav-link.active {
           color: #2ECC8F;
           background: rgba(34,168,118,0.1);
           border-color: rgba(34,168,118,0.15);
         }
-
-        /* ── RIGHT SIDE ── */
         .nav-right {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-shrink: 0;
+          display: flex; align-items: center;
+          gap: 8px; flex-shrink: 0;
         }
         .nav-trust-pill {
           display: flex; align-items: center; gap: 5px;
@@ -167,31 +178,27 @@ export default function Navbar() {
           position: relative;
           width: 40px; height: 40px;
           background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.09);
           border-radius: 11px;
           display: flex; align-items: center; justify-content: center;
-          cursor: pointer;
-          transition: all 0.2s;
-          text-decoration: none;
-          color: #A8A59A;
-          flex-shrink: 0;
+          cursor: pointer; transition: all 0.2s;
+          text-decoration: none; color: #A8A59A; flex-shrink: 0;
         }
         .nav-icon-btn:hover {
           background: rgba(255,255,255,0.1);
-          border-color: rgba(255,255,255,0.14);
+          border-color: rgba(255,255,255,0.15);
           color: #F2F0E8;
         }
         .nav-notif-dot {
-          position: absolute;
-          top: -4px; right: -4px;
-          width: 18px; height: 18px;
+          position: absolute; top: -5px; right: -5px;
+          min-width: 18px; height: 18px;
+          padding: 0 4px;
           background: linear-gradient(135deg, #C9A84C, #E2C07A);
-          border-radius: 50%;
-          color: #0C0D10;
+          border-radius: 9px; color: #0C0D10;
           font-size: 9px; font-weight: 900;
           display: flex; align-items: center; justify-content: center;
           border: 2px solid #060608;
-          box-shadow: 0 0 8px rgba(201,168,76,0.4);
+          box-shadow: 0 0 8px rgba(201,168,76,0.5);
         }
         .nav-avatar {
           width: 40px; height: 40px;
@@ -199,12 +206,9 @@ export default function Navbar() {
           border: 1px solid rgba(34,168,118,0.3);
           border-radius: 11px;
           display: flex; align-items: center; justify-content: center;
-          color: #22A876;
-          font-weight: 900; font-size: 15px;
-          cursor: pointer;
-          text-decoration: none;
-          transition: all 0.2s;
-          flex-shrink: 0;
+          color: #22A876; font-weight: 900; font-size: 15px;
+          cursor: pointer; text-decoration: none;
+          transition: all 0.2s; flex-shrink: 0;
           box-shadow: 0 0 12px rgba(34,168,118,0.1);
         }
         .nav-avatar:hover {
@@ -227,36 +231,27 @@ export default function Navbar() {
           box-shadow: 0 6px 24px rgba(201,168,76,0.3);
           transform: translateY(-1px);
         }
-        .nav-signin-link {
-          font-size: 13px; font-weight: 600;
-          color: #5E5C56; text-decoration: none;
-          padding: 8px 14px;
-          border-radius: 10px;
-          transition: color 0.2s;
-          white-space: nowrap;
+        .nav-signin {
+          font-size: 13px; font-weight: 600; color: #5E5C56;
+          text-decoration: none; padding: 8px 14px;
+          border-radius: 10px; transition: color 0.2s; white-space: nowrap;
         }
-        .nav-signin-link:hover { color: #A8A59A; }
-
-        /* ── MOBILE TOGGLE ── */
+        .nav-signin:hover { color: #A8A59A; }
         .nav-hamburger {
           display: none;
           width: 40px; height: 40px;
           background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.09);
           border-radius: 11px;
           align-items: center; justify-content: center;
-          cursor: pointer; color: #A8A59A;
-          flex-shrink: 0;
+          cursor: pointer; color: #A8A59A; flex-shrink: 0;
         }
-
-        /* ── MOBILE MENU ── */
         .nav-mobile-menu {
           display: none;
           background: rgba(6,6,8,0.99);
           border-top: 1px solid rgba(255,255,255,0.06);
           padding: 10px 20px 16px;
-          flex-direction: column;
-          gap: 3px;
+          flex-direction: column; gap: 3px;
         }
         .nav-mobile-menu.open { display: flex; }
         .nav-mobile-link {
@@ -264,40 +259,34 @@ export default function Navbar() {
           padding: 13px 14px; border-radius: 11px;
           font-size: 14px; font-weight: 600;
           text-decoration: none; color: #5E5C56;
-          transition: all 0.15s;
-          border: 1px solid transparent;
+          transition: all 0.15s; border: 1px solid transparent;
         }
-        .nav-mobile-link:hover {
-          background: rgba(255,255,255,0.05);
-          color: #A8A59A;
-        }
+        .nav-mobile-link:hover { background: rgba(255,255,255,0.05); color: #A8A59A; }
         .nav-mobile-link.active {
           background: rgba(34,168,118,0.1);
           color: #2ECC8F;
           border-color: rgba(34,168,118,0.15);
         }
-
-        /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
           .nav-links-wrap { display: none !important; }
           .nav-hamburger { display: flex !important; }
         }
         @media (max-width: 480px) {
           .navbar-inner { padding: 0 16px; }
-          .nav-trust-pill { display: none; }
+          .nav-trust-pill { display: none !important; }
         }
       `}</style>
 
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-inner">
 
-          {/* ── LOGO ── */}
+          {/* Logo */}
           <Link href={user ? '/dashboard' : '/'} className="nav-logo">
             <div className="nav-logo-mark">R</div>
             <span className="nav-logo-text">Rentora</span>
           </Link>
 
-          {/* ── CENTER LINKS (logged in only) ── */}
+          {/* Center links */}
           {user && (
             <div className="nav-links-wrap">
               {navLinks.map((link) => (
@@ -313,34 +302,33 @@ export default function Navbar() {
             </div>
           )}
 
-          {/* ── RIGHT SIDE ── */}
+          {/* Right side */}
           <div className="nav-right">
 
-            {/* Not logged in */}
+            {/* Guest */}
             {!user && (
               <>
-                <Link href="/auth/login" className="nav-signin-link">Sign in</Link>
+                <Link href="/auth/login" className="nav-signin">Sign in</Link>
                 <Link href="/auth/register" className="nav-get-started">
-                  <LogIn size={14} strokeWidth={2.5} />
-                  Get started
+                  <LogIn size={14} strokeWidth={2.5} /> Get started
                 </Link>
               </>
             )}
 
-            {/* Logged in */}
+            {/* Authenticated */}
             {user && (
               <>
-                {/* Trust score pill */}
+                {/* Trust score */}
                 {profile?.trust_score > 0 && (
                   <div className="nav-trust-pill">
                     <Star size={11} fill="#C9A84C" color="#C9A84C" strokeWidth={1} />
-                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#E2C07A', letterSpacing: '0.02em' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#E2C07A' }}>
                       {profile.trust_score}
                     </span>
                   </div>
                 )}
 
-                {/* Notification bell */}
+                {/* Notifications */}
                 <Link href="/notifications" className="nav-icon-btn">
                   <Bell size={17} strokeWidth={1.8} />
                   {notifCount > 0 && (
@@ -350,25 +338,28 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                {/* Profile avatar */}
+                {/* Profile */}
                 <Link href={`/profile/${user.id}`} className="nav-avatar">
                   {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
                 </Link>
 
-                {/* Hamburger (mobile only) */}
+                {/* Hamburger */}
                 <button
                   className="nav-hamburger"
                   onClick={() => setMobileOpen(!mobileOpen)}
                   style={{ border: 'none' }}
                 >
-                  {mobileOpen ? <X size={17} strokeWidth={2} /> : <Menu size={17} strokeWidth={2} />}
+                  {mobileOpen
+                    ? <X size={17} strokeWidth={2} />
+                    : <Menu size={17} strokeWidth={2} />
+                  }
                 </button>
               </>
             )}
           </div>
         </div>
 
-        {/* ── MOBILE DROPDOWN ── */}
+        {/* Mobile menu */}
         {user && (
           <div className={`nav-mobile-menu ${mobileOpen ? 'open' : ''}`}>
             {navLinks.map((link) => (

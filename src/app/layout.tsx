@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Navbar from '@/components/Navbar'
 
 export const metadata: Metadata = {
   title: 'Rentora — Student Item Rental Hub',
@@ -21,11 +22,6 @@ export const metadata: Metadata = {
     statusBarStyle: 'black-translucent',
     title: 'Rentora',
   },
-  openGraph: {
-    title: 'Rentora — Student Item Rental Hub',
-    description: 'Rent and lend academic items within your college campus network.',
-    type: 'website',
-  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -39,7 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-title" content="Rentora" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   )
 }
