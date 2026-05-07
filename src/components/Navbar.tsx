@@ -8,6 +8,7 @@ import {
   ShoppingBag, PlusCircle, ClipboardList,
   Sparkles, Bell, Star, Menu, X, LogIn
 } from 'lucide-react'
+import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -87,18 +88,14 @@ export default function Navbar() {
           background: rgba(6,6,8,0.97);
           border-bottom: 1px solid rgba(255,255,255,0.07);
           backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          transition: box-shadow 0.3s;
+          transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
         }
         .navbar.scrolled { box-shadow: 0 4px 32px rgba(0,0,0,0.5); border-bottom-color: rgba(255,255,255,0.1); }
-        .navbar-inner {
-          max-width: 1280px; margin: 0 auto; padding: 0 24px;
-          height: 66px; display: flex; align-items: center;
-          justify-content: space-between; gap: 16px;
-        }
+        .navbar-inner { max-width: 1280px; margin: 0 auto; padding: 0 24px; height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
         .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
         .nav-logo-text { font-size: 17px; font-weight: 900; letter-spacing: -0.03em; background: linear-gradient(135deg, #2ECC8F 30%, #4EDDAA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .nav-logo-sub { font-size: 9px; color: var(--g-bright); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; line-height: 1; }
-        .nav-links-wrap { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 4px; }
+        .nav-links-wrap { display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 4px; transition: background 0.3s, border-color 0.3s; }
         .nav-link { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; text-decoration: none; transition: all 0.2s; color: #5E5C56; white-space: nowrap; border: 1px solid transparent; }
         .nav-link:hover { color: #A8A59A; background: rgba(255,255,255,0.05); }
         .nav-link.active { color: #2ECC8F; background: rgba(34,168,118,0.1); border-color: rgba(34,168,118,0.15); }
@@ -107,7 +104,7 @@ export default function Navbar() {
         .nav-icon-btn { position: relative; width: 40px; height: 40px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09); border-radius: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; text-decoration: none; color: #A8A59A; flex-shrink: 0; }
         .nav-icon-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: #F2F0E8; }
         .nav-notif-dot { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 4px; background: linear-gradient(135deg, #C9A84C, #E2C07A); border-radius: 9px; color: #0C0D10; font-size: 9px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #060608; box-shadow: 0 0 8px rgba(201,168,76,0.5); }
-        .nav-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #0D2B1A, #145738); border: 1px solid rgba(34,168,118,0.3); border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #22A876; font-weight: 900; font-size: 15px; cursor: pointer; text-decoration: none; transition: all 0.2s; flex-shrink: 0; box-shadow: 0 0 12px rgba(34,168,118,0.1); }
+        .nav-avatar { width: 40px; height: 40px; background: linear-gradient(135deg, #0D2B1A, #145738); border: 1px solid rgba(34,168,118,0.3); border-radius: 11px; display: flex; align-items: center; justify-content: center; color: #22A876; font-weight: 900; font-size: 15px; cursor: pointer; text-decoration: none; transition: all 0.2s; flex-shrink: 0; }
         .nav-avatar:hover { border-color: rgba(34,168,118,0.5); box-shadow: 0 0 20px rgba(34,168,118,0.2); }
         .nav-get-started { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; background: linear-gradient(135deg, #6B4C18, #C9A84C, #A07828); border: 1px solid rgba(201,168,76,0.4); color: #0C0D10; font-size: 13px; font-weight: 800; border-radius: 11px; text-decoration: none; transition: all 0.25s; box-shadow: 0 4px 16px rgba(201,168,76,0.2); white-space: nowrap; }
         .nav-get-started:hover { background: linear-gradient(135deg, #7A5520, #E2C07A, #B8922E); box-shadow: 0 6px 24px rgba(201,168,76,0.3); transform: translateY(-1px); }
@@ -177,6 +174,9 @@ export default function Navbar() {
                 </button>
               </>
             )}
+
+            {/* Theme toggle — always visible */}
+            <ThemeToggle />
           </div>
         </div>
 
