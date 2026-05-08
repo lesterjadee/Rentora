@@ -20,17 +20,17 @@
   --border-hi:  rgba(0,0,0,0.20);
 
   /* Bottle Green — updated to softer tones */
-  --g-pale:   #a5ffac;
-  --g-light:  #6ee77a;
-  --g-bright: #22c55e;
-  --g-vivid:  #16a34a;
-  --g-rich:   #15803d;
-  --g-deep:   #166534;
-  --g-dark:   #14532d;
-  --g-neon:   #a5ffac;
-  --g-mid:    #16a34a;
-  --g-glow:   rgba(165,255,172,0.25);
-  --g-glow-hi:rgba(165,255,172,0.4);
+  --g-pale:   #bbf7d0;
+  --g-light:  #4ade80;
+  --g-bright: #16a34a;
+  --g-vivid:  #15803d;
+  --g-rich:   #166534;
+  --g-deep:   #14532d;
+  --g-dark:   #052e16;
+  --g-neon:   #16a34a;
+  --g-mid:    #15803d;
+  --g-glow:   rgba(22,163,74,0.12);
+  --g-glow-hi:rgba(22,163,74,0.22);
 
   /* Gold */
   --au-deep:   #2A1E08;
