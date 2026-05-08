@@ -180,7 +180,7 @@ export default function Navbar() {
                 {profile?.trust_score > 0 && (
                   <div className="nav-trust-pill">
                     <Star size={11} fill="#C9A84C" color="#C9A84C" strokeWidth={1} />
-                    <span style={{ fontSize: '12px', fontWeight: '800', color: var(--au-dark) }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--au-dark)' }}>
                       {profile.trust_score}
                     </span>
                   </div>
