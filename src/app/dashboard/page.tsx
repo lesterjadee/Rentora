@@ -229,7 +229,7 @@ export default async function DashboardPage() {
                 iconColor: '#15803d',
                 iconBg: 'rgba(165,255,172,0.35)',
                 iconBorder: 'rgba(34,197,94,0.25)',
-                bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)',
+                bg: 'linear-gradient(135deg, #d1fae5, #a7f3d0)',
                 border: 'rgba(34,197,94,0.25)',
                 shadow: '0 4px 16px rgba(34,197,94,0.12)',
               },

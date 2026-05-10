@@ -20,17 +20,17 @@
   --border-hi:  rgba(0,0,0,0.20);
 
   /* Bottle Green — updated to softer tones */
-  --g-pale:   #d1fae5;
-  --g-light:  #22A876;
-  --g-bright: #22A876;
-  --g-vivid:  #1A7A52;
-  --g-rich:   #145738;
-  --g-deep:   #0F3D2A;
-  --g-dark:   #0D2B1A;
-  --g-neon:   #22A876;
-  --g-mid:    #1A7A52;
-  --g-glow:   rgba(34,168,118,0.12);
-  --g-glow-hi:rgba(34,168,118,0.22);
+  --g-pale:   #a7f3d0;
+  --g-light:  #2ECC8F;
+  --g-bright: #2ECC8F;
+  --g-vivid:  #22A876;
+  --g-rich:   #1A7A52;
+  --g-deep:   #145738;
+  --g-dark:   #0F3D2A;
+  --g-neon:   #2ECC8F;
+  --g-mid:    #22A876;
+  --g-glow:   rgba(46,204,143,0.15);
+  --g-glow-hi:rgba(46,204,143,0.25);
 
   /* Gold */
   --au-deep:   #2A1E08;
@@ -385,7 +385,7 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
 .rec-banner,
 .rd-banner,
 .prof-banner {
-  background: linear-gradient(150deg, #f0fdf4 0%, #dcfce7 45%, #f7f9fc 100%) !important;
+  background: linear-gradient(150deg, #d1fae5 0%, #a7f3d0 45%, #ecfdf5 100%) !important;
   border-bottom: 1px solid rgba(34,197,94,0.15) !important;
 }
 
@@ -408,7 +408,7 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
    AUTH PAGES — LIGHT
    ============================================================ */
 .fp-left, .rp-left, .reg-left, .login-left {
-  background: linear-gradient(160deg, #f0fdf4 0%, #dcfce7 45%, #f7f9fc 100%) !important;
+  background: linear-gradient(160deg, #d1fae5 0%, #a7f3d0 45%, #ecfdf5 100%) !important;
   border-right: 1px solid rgba(34,197,94,0.15) !important;
 }
 .fp-right, .rp-right, .reg-right, .login-right {
@@ -421,8 +421,8 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
 .hp { background: var(--bg-void) !important; }
 .hp-hero-bg {
   background:
-    radial-gradient(ellipse 80% 60% at 60% -10%, rgba(165,255,172,0.2) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 10% 80%,  rgba(34,197,94,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 60% -10%, rgba(46,204,143,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 80%,  rgba(34,168,118,0.10) 0%, transparent 50%),
     radial-gradient(ellipse 40% 30% at 90% 60%,  rgba(201,168,76,0.05) 0%, transparent 40%) !important;
 }
 .hp-school-badge {
@@ -482,7 +482,7 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
   background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent) !important;
 }
 .hp-cta-section {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 40%, #f7fdf8 70%, #f7f9fc 100%) !important;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 40%, #ecfdf5 70%, #f0fdf4 100%) !important;
   border: 1px solid rgba(34,197,94,0.18) !important;
 }
 .hp-cta-section::before {
@@ -535,14 +535,14 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
 .rd-card { background: #FFFFFF !important; border-color: var(--border-sub) !important; }
 .rn { background: var(--bg-void) !important; }
 .rn-card { background: #FFFFFF !important; border-color: var(--border-sub) !important; }
-.rn-summary { background: linear-gradient(135deg, #f0fdf4, #dcfce7 50%, #f7f9fc) !important; border-color: rgba(34,197,94,0.18) !important; }
+.rn-summary { background: linear-gradient(135deg, #d1fae5, #a7f3d0 50%, #ecfdf5) !important; border-color: rgba(34,197,94,0.18) !important; }
 .rn-summary::before { background: linear-gradient(90deg, transparent, rgba(34,197,94,0.25), transparent) !important; }
 .rn-total-box { background: rgba(201,168,76,0.08) !important; border-color: rgba(201,168,76,0.2) !important; }
 .ni { background: var(--bg-void) !important; }
 .ni-card { background: #FFFFFF !important; border-color: var(--border-sub) !important; }
 .ni-upload-zone { background: var(--bg-raised) !important; border-color: var(--border-mid) !important; }
 .ni-upload-zone:hover { background: var(--bg-hover) !important; border-color: rgba(34,197,94,0.3) !important; }
-.ni-price-preview { background: linear-gradient(135deg, #f0fdf4, #dcfce7 50%, #f7f9fc) !important; border-color: rgba(34,197,94,0.18) !important; }
+.ni-price-preview { background: linear-gradient(135deg, #d1fae5, #a7f3d0 50%, #ecfdf5) !important; border-color: rgba(34,197,94,0.18) !important; }
 .ni-price-preview::before { background: linear-gradient(90deg, transparent, rgba(34,197,94,0.25), transparent) !important; }
 .ni-price-box { background: rgba(165,255,172,0.12) !important; border-color: rgba(34,197,94,0.12) !important; }
 .rv { background: var(--bg-void) !important; }
@@ -556,7 +556,7 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
    PROFILE
    ============================================================ */
 .prof { background: var(--bg-void) !important; }
-.prof-banner { background: linear-gradient(150deg, #f0fdf4 0%, #dcfce7 45%, #f7f9fc 100%) !important; }
+.prof-banner { background: linear-gradient(135deg, #d1fae5, #a7f3d0 50%, #ecfdf5) !important; }
 .prof-stats { background: #FFFFFF !important; border-color: var(--border-mid) !important; box-shadow: var(--shadow-lg) !important; }
 .prof-stat { border-right-color: var(--border-sub) !important; }
 .prof-stat:hover { background: var(--bg-raised) !important; }
