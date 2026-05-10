@@ -21,16 +21,16 @@
 
   /* Bottle Green — updated to softer tones */
   --g-pale:   #d1fae5;
-  --g-light:  #1A7A52;
-  --g-bright: #1A7A52;
-  --g-vivid:  #145738;
-  --g-rich:   #0F3D2A;
-  --g-deep:   #0D2B1A;
-  --g-dark:   #071A11;
-  --g-neon:   #1A7A52;
-  --g-mid:    #145738;
-  --g-glow:   rgba(26,122,82,0.12);
-  --g-glow-hi:rgba(26,122,82,0.22);
+  --g-light:  #22A876;
+  --g-bright: #22A876;
+  --g-vivid:  #1A7A52;
+  --g-rich:   #145738;
+  --g-deep:   #0F3D2A;
+  --g-dark:   #0D2B1A;
+  --g-neon:   #22A876;
+  --g-mid:    #1A7A52;
+  --g-glow:   rgba(34,168,118,0.12);
+  --g-glow-hi:rgba(34,168,118,0.22);
 
   /* Gold */
   --au-deep:   #2A1E08;
