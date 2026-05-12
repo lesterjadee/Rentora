@@ -58,8 +58,9 @@ export default function RegisterPage() {
     { title: '4. Rental Transactions', content: 'All rental agreements are made directly between the renter and owner. Rentora facilitates these agreements but is not a party to any transaction and does not handle payments.' },
     { title: '5. Trust Score and Reviews', content: 'You agree to leave reviews that are truthful and based on your actual experience. Fabricated or malicious reviews are prohibited.' },
     { title: '6. Item Condition and Responsibility', content: 'Renters are responsible for returning items in the same condition received. Any damage caused during the rental period is the responsibility of the renter.' },
-    { title: '7. Privacy', content: 'Rentora collects your name, student ID, and Gordon College email for account creation. This information is stored securely and never sold to third parties.' },
-    { title: '8. Account Termination', content: 'Rentora reserves the right to suspend or terminate accounts found in violation of these Terms. Users who engage in fraud or harassment may be removed without prior notice.' },
+    { title: '7. Hygiene and Cleanliness', content: 'To promote proper hygiene within the Gordon College community, owners must ensure that wearable items (such as lab gowns, uniforms, or safety gear) are clean and washed before lending them out. In turn, renters are strictly required to wash and clean these items before returning them to the owner.' },
+    { title: '8. Privacy', content: 'Rentora collects your name, student ID, and Gordon College email for account creation. This information is stored securely and never sold to third parties.' },
+    { title: '9. Account Termination', content: 'Rentora reserves the right to suspend or terminate accounts found in violation of these Terms. Users who engage in fraud or harassment may be removed without prior notice.' },
   ]
 
   return (
