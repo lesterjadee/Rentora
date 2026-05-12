@@ -41,7 +41,7 @@ export default async function Home() {
         .hp-overline-text { font-size: 11px; font-weight: 800; color: var(--g-rich); letter-spacing: 0.1em; text-transform: uppercase; }
 
         .hp-h1 { font-size: clamp(42px,6vw,70px); font-weight: 900; line-height: 1.02; letter-spacing: -0.05em; color: var(--tx-bright); margin-bottom: 22px; }
-        .hp-h1-accent { display: block; background: linear-gradient(135deg, var(--g-mid) 0%, var(--g-rich) 40%, var(--au-mid) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hp-h1-accent { display: block; background: linear-gradient(135deg, var(--g-mid) 0%, var(--g-rich) 40%, var(--au-mid) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .hp-sub { font-size: clamp(14px,1.8vw,16px); color: var(--tx-muted); line-height: 1.85; max-width: 460px; margin-bottom: 40px; }
         .hp-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 52px; }
 
@@ -53,11 +53,27 @@ export default async function Home() {
         .hp-stat-lbl { font-size: 10px; color: var(--tx-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
 
         .hp-card-wrap { position: relative; width: 100%; max-width: 360px; margin: 0 auto; }
+
+        /* Green watercolor paint drip effect */
+        .hp-paint-drip {
+          position: absolute;
+          inset: -60px -80px -80px -80px;
+          pointer-events: none; z-index: 0;
+          background:
+            radial-gradient(ellipse 60% 18% at 50% 0%,   rgba(4,149,22,0.18) 0%, transparent 65%),
+            radial-gradient(ellipse 18% 55% at 28% 8%,   rgba(4,149,22,0.12) 0%, transparent 70%),
+            radial-gradient(ellipse 12% 45% at 72% 6%,   rgba(4,149,22,0.10) 0%, transparent 65%),
+            radial-gradient(ellipse 22% 38% at 45% 18%,  rgba(4,149,22,0.08) 0%, transparent 70%),
+            radial-gradient(ellipse 10% 30% at 60% 25%,  rgba(4,149,22,0.06) 0%, transparent 65%),
+            radial-gradient(ellipse 55% 20% at 50% 100%, rgba(4,149,22,0.0)  0%, transparent 100%);
+          filter: blur(8px);
+        }
+
         .hp-card {
           background: #FFFFFF; border: 1.5px solid rgba(4,149,22,0.18);
           border-radius: 24px; padding: 26px;
           box-shadow: 0 20px 60px rgba(1,30,5,0.13), 0 4px 16px rgba(1,30,5,0.07);
-          position: relative; overflow: hidden;
+          position: relative; overflow: hidden; z-index: 1;
         }
         .hp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--g-dark), var(--g-mid), var(--au-mid)); }
         .hp-card-img { background: var(--bg-raised); border: 1px solid rgba(4,149,22,0.08); border-radius: 16px; height: 165px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative; overflow: hidden; }
@@ -139,8 +155,8 @@ export default async function Home() {
               </div>
               <div className="hp-stats">
                 {[
-                  { icon: <Package size={13} color="var(--g-rich)" />,  val: itemCount ?? 0,  lbl: 'Items available' },
-                  { icon: <Users size={13} color="var(--g-rich)" />,    val: userCount ?? 0,  lbl: 'GC students' },
+                  { icon: <Package size={13} color="var(--g-rich)" />,     val: itemCount ?? 0,  lbl: 'Items available' },
+                  { icon: <Users size={13} color="var(--g-rich)" />,       val: userCount ?? 0,  lbl: 'GC students' },
                   { icon: <TrendingUp size={13} color="var(--au-dark)" />, val: rentalCount ?? 0, lbl: 'Rentals done' },
                 ].map((s, i) => (
                   <div key={i} className="hp-stat">
@@ -154,6 +170,9 @@ export default async function Home() {
 
             <div className="animate-fade-up-delay" style={{ display: 'flex', justifyContent: 'center' }}>
               <div className="hp-card-wrap">
+                {/* Green watercolor paint drip */}
+                <div className="hp-paint-drip" />
+
                 <div className="hp-card">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
                     <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Featured Item</span>
