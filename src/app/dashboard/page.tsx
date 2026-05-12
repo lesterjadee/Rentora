@@ -93,7 +93,7 @@ export default async function DashboardPage() {
                 <p style={{ fontSize: '14px', color: 'rgba(240,253,244,0.55)', margin: 0 }}>{profile?.student_id || user.email}</p>
               </div>
               <form action="/auth/signout" method="post">
-                <button type="submit" style={{ padding: '9px 18px', background: 'rgba(255,255,255,0.08)', color: 'rgba(240,253,244,0.75)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: '10px', fontWeight: '600', fontSize: '13px', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>
+                <button type="submit" style={{ padding: '9px 18px', background: 'linear-gradient(135deg, #991B1B, #DC2626)', color: '#FFFFFF', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', fontWeight: '600', fontSize: '13px', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif', boxShadow: '0 2px 8px rgba(220,38,38,0.25)' }}>
                   Sign Out
                 </button>
               </form>
