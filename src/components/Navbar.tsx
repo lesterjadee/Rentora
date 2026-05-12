@@ -51,15 +51,12 @@ export default function Navbar() {
     }
   }, [])
 
-  useEffect(() => {
-    if (user) fetchNotifCount(user.id)
-  }, [pathname])
+  useEffect(() => { if (user) fetchNotifCount(user.id) }, [pathname])
 
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from('profiles').select('full_name, trust_score').eq('id', userId).single()
     if (data) setProfile(data)
   }
-
   const fetchNotifCount = async (userId: string) => {
     const { count } = await supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('user_id', userId).eq('read', false)
     setNotifCount(count || 0)
@@ -69,10 +66,10 @@ export default function Navbar() {
   if (isAuthPage) return null
 
   const navLinks = [
-    { href: '/items',           label: 'Browse',    icon: <ShoppingBag size={14} strokeWidth={2} /> },
-    { href: '/items/new',       label: 'List Item',  icon: <PlusCircle size={14} strokeWidth={2} /> },
-    { href: '/rentals',         label: 'Rentals',    icon: <ClipboardList size={14} strokeWidth={2} /> },
-    { href: '/recommendations', label: 'For You',    icon: <Sparkles size={14} strokeWidth={2} /> },
+    { href: '/items',           label: 'Browse',   icon: <ShoppingBag size={14} strokeWidth={2} /> },
+    { href: '/items/new',       label: 'List Item', icon: <PlusCircle size={14} strokeWidth={2} /> },
+    { href: '/rentals',         label: 'Rentals',   icon: <ClipboardList size={14} strokeWidth={2} /> },
+    { href: '/recommendations', label: 'For You',   icon: <Sparkles size={14} strokeWidth={2} /> },
   ]
 
   return (
@@ -83,44 +80,35 @@ export default function Navbar() {
           height: 68px; display: flex; align-items: center;
           justify-content: space-between; gap: 16px;
         }
-        .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; }
-        .nav-logo-wordmark { display: flex; flex-direction: column; gap: 0; }
-        .nav-logo-text {
-          font-size: 18px; font-weight: 900; letter-spacing: -0.04em; line-height: 1;
-          color: var(--g-dark);
+        .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; flex-shrink: 0; transition: opacity 0.2s; }
+        .nav-logo:hover { opacity: 0.85; }
+        .nav-logo-icon {
+          width: 36px; height: 36px;
+          background: linear-gradient(135deg, var(--g-deep), var(--g-dark), var(--g-mid));
+          border: 1.5px solid rgba(4,149,22,0.25);
+          border-radius: 10px; display: flex; align-items: center;
+          justify-content: center; flex-shrink: 0; overflow: hidden;
+          box-shadow: 0 2px 10px rgba(1,30,5,0.18);
         }
-        .nav-logo-sub {
-          font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
-          text-transform: uppercase; color: var(--g-rich); line-height: 1; margin-top: 2px;
-        }
-        .nav-logo:hover .nav-logo-text { color: var(--g-mid); }
+        .nav-logo-text { font-size: 18px; font-weight: 900; letter-spacing: -0.04em; color: var(--g-dark); line-height: 1; }
+        .nav-logo-sub  { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--g-rich); line-height: 1; margin-top: 2px; }
         .nav-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .nav-get-started {
-          display: inline-flex; align-items: center; gap: 7px;
-          padding: 9px 20px;
+          display: inline-flex; align-items: center; gap: 7px; padding: 9px 20px;
           background: linear-gradient(135deg, var(--g-deep), var(--g-dark), var(--g-mid));
-          border: 1px solid rgba(92,219,149,0.15);
-          color: #FFFFFF; font-size: 13px; font-weight: 700;
-          border-radius: 11px; text-decoration: none;
-          transition: all 0.25s;
-          box-shadow: 0 4px 14px rgba(7,24,18,0.2);
-          white-space: nowrap;
+          border: 1px solid rgba(4,149,22,0.25); color: #FFFFFF;
+          font-size: 13px; font-weight: 700; border-radius: 11px; text-decoration: none;
+          transition: all 0.25s; box-shadow: 0 4px 14px rgba(1,30,5,0.2); white-space: nowrap;
         }
         .nav-get-started:hover {
           background: linear-gradient(135deg, var(--g-dark), var(--g-mid), var(--g-rich));
-          box-shadow: 0 6px 22px rgba(7,24,18,0.3);
-          transform: translateY(-1px);
+          box-shadow: 0 6px 22px rgba(1,30,5,0.3); transform: translateY(-1px);
         }
-        .nav-signin {
-          font-size: 13px; font-weight: 600; color: var(--tx-muted);
-          text-decoration: none; padding: 8px 14px;
-          border-radius: 10px; transition: color 0.2s; white-space: nowrap;
-        }
+        .nav-signin { font-size: 13px; font-weight: 600; color: var(--tx-muted); text-decoration: none; padding: 8px 14px; border-radius: 10px; transition: color 0.2s; white-space: nowrap; }
         .nav-signin:hover { color: var(--g-mid); }
         .nav-hamburger {
           display: none; width: 40px; height: 40px;
-          background: var(--bg-raised);
-          border: 1.5px solid rgba(27,77,62,0.15);
+          background: var(--bg-raised); border: 1.5px solid rgba(4,149,22,0.12);
           border-radius: 11px; align-items: center; justify-content: center;
           cursor: pointer; color: var(--tx-muted); flex-shrink: 0;
         }
@@ -131,38 +119,26 @@ export default function Navbar() {
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-inner">
 
-          {/* Logo */}
           <Link href={user ? '/dashboard' : '/'} className="nav-logo">
-            <div style={{
-              width: '36px', height: '36px',
-              background: 'linear-gradient(135deg, var(--g-deep), var(--g-dark), var(--g-mid))',
-              border: '1.5px solid rgba(92,219,149,0.2)',
-              borderRadius: '10px',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 2px 10px rgba(7,24,18,0.2)',
-              flexShrink: 0, overflow: 'hidden',
-            }}>
+            <div className="nav-logo-icon">
               <img src="/gcoc.png" alt="GC" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
             </div>
-            <div className="nav-logo-wordmark">
-              <span className="nav-logo-text">Rentora</span>
-              <span className="nav-logo-sub">Gordon College</span>
+            <div>
+              <div className="nav-logo-text">Rentora</div>
+              <div className="nav-logo-sub">Gordon College</div>
             </div>
           </Link>
 
-          {/* Center nav */}
           {user && (
             <div className="nav-links-wrap">
-              {navLinks.map((link) => (
+              {navLinks.map(link => (
                 <Link key={link.href} href={link.href} className={`nav-link ${pathname === link.href ? 'active' : ''}`}>
-                  {link.icon}
-                  {link.label}
+                  {link.icon}{link.label}
                 </Link>
               ))}
             </div>
           )}
 
-          {/* Right */}
           <div className="nav-right">
             {!user && (
               <>
@@ -177,16 +153,12 @@ export default function Navbar() {
                 {profile?.trust_score > 0 && (
                   <div className="nav-trust-pill">
                     <Star size={11} fill="#C9A84C" color="#C9A84C" strokeWidth={1} />
-                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--au-dark)' }}>
-                      {profile.trust_score}
-                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--au-dark)' }}>{profile.trust_score}</span>
                   </div>
                 )}
                 <Link href="/notifications" className="nav-icon-btn">
                   <Bell size={17} strokeWidth={1.8} />
-                  {notifCount > 0 && (
-                    <span className="nav-notif-dot">{notifCount > 9 ? '9+' : notifCount}</span>
-                  )}
+                  {notifCount > 0 && <span className="nav-notif-dot">{notifCount > 9 ? '9+' : notifCount}</span>}
                 </Link>
                 <Link href={`/profile/${user.id}`} className="nav-avatar">
                   {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
@@ -201,10 +173,9 @@ export default function Navbar() {
 
         {user && (
           <div className={`nav-mobile-menu ${mobileOpen ? 'open' : ''}`}>
-            {navLinks.map((link) => (
+            {navLinks.map(link => (
               <Link key={link.href} href={link.href} className={`nav-mobile-link ${pathname === link.href ? 'active' : ''}`} onClick={() => setMobileOpen(false)}>
-                {link.icon}
-                {link.label}
+                {link.icon}{link.label}
               </Link>
             ))}
           </div>
