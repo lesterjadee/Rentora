@@ -88,7 +88,7 @@ export default async function DashboardPage() {
                   <span style={{ fontSize: '11px', fontWeight: '800', color: '#7FFFC4', textTransform: 'uppercase' as const, letterSpacing: '0.12em' }}>Dashboard</span>
                 </div>
                 <h1 style={{ fontSize: 'clamp(26px,5vw,40px)', fontWeight: '900', color: '#F0FDF4', letterSpacing: '-0.04em', margin: '0 0 8px' }}>
-                  Welcome back, <span style={{ background: 'linear-gradient(135deg, #7FFFC4, #E2C07A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{profile?.full_name?.split(' ')[0]}!</span>
+                  Welcome back, <span className="gold-shimmer">{profile?.full_name?.split(' ')[0]}!</span>
                 </h1>
                 <p style={{ fontSize: '14px', color: 'rgba(240,253,244,0.55)', margin: 0 }}>{profile?.student_id || user.email}</p>
               </div>
