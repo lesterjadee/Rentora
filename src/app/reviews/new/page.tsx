@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -344,11 +344,7 @@ function ReviewForm() {
 
 export default function NewReviewPage() {
   return (
-    <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: 'var(--bg-void)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--g-mid)', fontSize: '14px', fontWeight: '700', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Loading...</p>
-      </div>
-    }>
+    <Suspense fallback={<div />}>
       <ReviewForm />
     </Suspense>
   )

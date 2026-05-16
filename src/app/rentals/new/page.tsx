@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -328,11 +328,7 @@ function RentalForm() {
 
 export default function NewRentalPage() {
   return (
-    <Suspense fallback={
-      <div style={{ minHeight: '100vh', background: 'var(--bg-void)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>
-        <p style={{ color: 'var(--tx-muted)', fontSize: '14px' }}>Loading...</p>
-      </div>
-    }>
+    <Suspense fallback={<div />}>
       <RentalForm />
     </Suspense>
   )
