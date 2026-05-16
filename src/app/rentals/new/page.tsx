@@ -1,335 +1,244 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { ArrowLeft, CalendarDays, MessageSquare, Tag } from 'lucide-react'
+import { ArrowLeft, Package, AlertTriangle, Clock, ShieldCheck } from 'lucide-react'
+import { getTrustTier, getVisibleAt, canCreateRental } from '@/lib/trustUtils'
 
-function RentalForm() {
+export default function NewRentalPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const itemId = searchParams.get('item')
+  const itemId = searchParams.get('item_id')
   const supabase = createClient()
-
   const [item, setItem] = useState<any>(null)
+  const [userProfile, setUserProfile] = useState<any>(null)
+  const [activeRentalCount, setActiveRentalCount] = useState(0)
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
-  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!itemId) return
-    const fetchItem = async () => {
-      const { data } = await supabase
-        .from('items')
-        .select('*, profiles(full_name, trust_score), categories(name, icon)')
-        .eq('id', itemId)
-        .single()
-      if (data) setItem(data)
+    if (!itemId) { router.push('/items'); return }
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/auth/login'); return }
+
+      const [{ data: itemData }, { data: profileData }, { count }] = await Promise.all([
+        supabase.from('items').select('*, categories(name), profiles(full_name, trust_score)').eq('id', itemId).single(),
+        supabase.from('profiles').select('trust_score').eq('id', user.id).single(),
+        supabase.from('rentals').select('*', { count: 'exact', head: true }).eq('renter_id', user.id).in('status', ['pending', 'approved', 'returning']),
+      ])
+
+      if (itemData) setItem(itemData)
+      else router.push('/items')
+      if (profileData) setUserProfile(profileData)
+      setActiveRentalCount(count || 0)
     }
-    fetchItem()
+    init()
   }, [itemId])
 
-  const totalDays = startDate && endDate
-    ? Math.max(0, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)))
+  const days = startDate && endDate
+    ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000))
     : 0
-  const totalPrice = item ? totalDays * item.price_per_day : 0
+  const total = days * (item?.price_per_day || 0)
+
+  const tier = getTrustTier(userProfile?.trust_score)
+  const rentalCheck = canCreateRental(tier, activeRentalCount)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/auth/login'); return }
-
-    if (new Date(endDate) <= new Date(startDate)) {
-      setError('End date must be after start date.')
+    if (!rentalCheck.allowed) {
+      setError(rentalCheck.reason || 'Cannot create rental.')
       setLoading(false)
       return
     }
 
-    const { data: conflicts } = await supabase
-      .from('rentals')
-      .select('id')
-      .eq('item_id', itemId)
-      .in('status', ['approved', 'active'])
-      .or(`and(start_date.lte.${endDate},end_date.gte.${startDate})`)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/auth/login'); return }
+      if (!startDate || !endDate) throw new Error('Please select both start and end dates')
+      if (new Date(endDate) <= new Date(startDate)) throw new Error('End date must be after start date')
 
-    if (conflicts && conflicts.length > 0) {
-      setError('This item is already booked for the selected dates. Please choose different dates.')
+      const visibleAt = getVisibleAt(tier)
+
+      const { data, error: insertError } = await supabase.from('rentals').insert({
+        renter_id: user.id,
+        owner_id: item.owner_id,
+        item_id: itemId,
+        start_date: startDate,
+        end_date: endDate,
+        status: 'pending',
+        total_price: total,
+        visible_at: visibleAt,
+      }).select().single()
+
+      if (insertError) throw insertError
+      router.push(`/rentals/${data.id}`)
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong')
       setLoading(false)
-      return
     }
-
-    const { error: insertError } = await supabase.from('rentals').insert({
-      item_id: itemId,
-      renter_id: user.id,
-      owner_id: item.owner_id,
-      start_date: startDate,
-      end_date: endDate,
-      total_price: totalPrice,
-      message: message || null,
-      status: 'pending'
-    })
-
-    if (insertError) { setError(insertError.message); setLoading(false); return }
-    router.push('/rentals')
-    router.refresh()
   }
 
-  const today = new Date().toISOString().split('T')[0]
-
   if (!item) return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-void)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>
-      <p style={{ color: 'var(--tx-muted)', fontSize: '14px' }}>Loading item details...</p>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-void)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '48px', height: '48px', background: 'rgba(4,149,22,0.06)', border: '1px solid rgba(4,149,22,0.12)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Package size={24} color="var(--g-rich)" strokeWidth={1.5} />
+      </div>
     </div>
   )
+
+  const inputStyle = { width: '100%', padding: '13px 16px', fontSize: '14px', borderRadius: '12px', boxSizing: 'border-box' as const }
+  const labelStyle = { display: 'block', fontSize: '11px', fontWeight: '800' as const, color: 'var(--tx-muted)', marginBottom: '8px', textTransform: 'uppercase' as const, letterSpacing: '0.08em' }
 
   return (
     <>
       <style>{`
         .rn { min-height: 100vh; background: var(--bg-void); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-        .rn-banner {
-          position: relative; overflow: hidden;
-          padding: 40px 28px 52px;
-          background: linear-gradient(150deg, #060E09 0%, #0A2018 40%, #0C0D10 100%);
-          border-bottom: 1px solid rgba(34,168,118,0.08);
-        }
-        .rn-banner::after {
-          content: ''; position: absolute;
-          bottom: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(201,168,76,0.12), transparent);
-        }
-        .rn-inner { max-width: 820px; margin: 0 auto; padding: 32px 28px 60px; }
-        .rn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-        .rn-card {
-          background: var(--bg-card);
-          border: 1px solid var(--border-sub);
-          border-radius: 20px; padding: 26px;
-          box-shadow: var(--shadow-sm);
-        }
-        .rn-label {
-          display: block; font-size: 11px; font-weight: 800;
-          color: var(--tx-muted); text-transform: uppercase;
-          letter-spacing: 0.08em; margin-bottom: 10px;
-        }
-        .rn-input {
-          width: 100%; padding: 13px 16px;
-          background: var(--bg-raised) !important;
-          border: 1px solid var(--border-sub) !important;
-          border-radius: 12px !important;
-          font-size: 14px; color: var(--tx-bright) !important;
-          outline: none; box-sizing: border-box;
-          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .rn-input:focus {
-          border-color: rgba(201,168,76,0.4) !important;
-          box-shadow: 0 0 0 3px rgba(201,168,76,0.08) !important;
-        }
-        .rn-input::placeholder { color: var(--tx-muted) !important; }
-        .rn-input[type="date"]::-webkit-calendar-picker-indicator {
-          filter: invert(0.5) sepia(1) hue-rotate(90deg);
-          cursor: pointer; opacity: 0.6;
-        }
-        .rn-summary {
-          background: linear-gradient(135deg, #080E0A, #0D2B1A 50%, #080808);
-          border: 1px solid rgba(34,168,118,0.15);
-          border-radius: 20px; padding: 26px;
-          position: relative; overflow: hidden;
-          margin-bottom: 14px;
-        }
-        .rn-summary::before {
-          content: ''; position: absolute;
-          top: 0; left: 0; right: 0; height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(34,168,118,0.4), transparent);
-        }
-        .rn-summary-row {
-          display: flex; justify-content: space-between;
-          align-items: center; padding: 10px 0;
-          border-bottom: 1px solid var(--border-dim);
-        }
-        .rn-summary-row:last-child { border-bottom: none; }
-        .rn-total-box {
-          background: linear-gradient(135deg, var(--au-deep), rgba(42,30,8,0.5));
-          border: 1px solid rgba(201,168,76,0.2);
-          border-radius: 14px; padding: 18px 20px;
-          margin-top: 16px;
-          display: flex; justify-content: space-between; align-items: center;
-        }
-        .rn-submit {
-          width: 100%; padding: 16px;
-          background: linear-gradient(135deg, #6B4C18, var(--au-mid), #A07828);
-          border: 1px solid rgba(201,168,76,0.4);
-          color: #0C0D10; font-weight: 800; font-size: 16px;
-          border-radius: 14px; cursor: pointer;
-          font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-          box-shadow: 0 4px 20px rgba(201,168,76,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
-          letter-spacing: -0.01em;
-        }
-        .rn-submit:hover:not(:disabled) {
-          background: linear-gradient(135deg, #7A5520, var(--au-light), #C9A030);
-          box-shadow: 0 6px 32px rgba(201,168,76,0.35);
-          transform: translateY(-1px);
-        }
-        .rn-submit:disabled {
-          background: var(--bg-raised); border-color: var(--border-sub);
-          color: var(--tx-muted); cursor: not-allowed;
-          box-shadow: none; transform: none;
-        }
-        @media (max-width: 640px) {
-          .rn-grid { grid-template-columns: 1fr; }
-          .rn-inner { padding: 24px 20px 48px; }
-          .rn-banner { padding: 32px 20px 44px; }
-        }
+        .rn-banner { position: relative; overflow: hidden; padding: 44px 28px 96px; border-bottom: 1px solid rgba(6,214,33,0.08); }
+        .rn-banner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 50% 70% at 90% 0%, rgba(110,255,128,0.06), transparent 55%); pointer-events: none; }
+        .rn-banner::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.22), transparent); }
+        .rn-card { background: #FFFFFF; border: 1.5px solid rgba(4,149,22,0.1); border-radius: 22px; padding: 28px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+        .rn-grid { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+        .rn-summary { position: sticky; top: 84px; background: linear-gradient(135deg, #011E05, #023D09 50%, #011E05); border: 1px solid rgba(6,214,33,0.08); border-radius: 20px; padding: 24px; overflow: hidden; }
+        .rn-summary::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(110,255,128,0.2), transparent); }
+        .rn-total-box { background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.22); border-radius: 14px; padding: 16px; margin-top: 16px; }
+        @media (max-width: 900px) { .rn-grid { grid-template-columns: 1fr; } .rn-summary { position: static; } }
       `}</style>
 
       <div className="rn">
-        {/* Banner */}
         <div className="rn-banner">
-          <div style={{ maxWidth: '820px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
-            <Link href={`/items/${itemId}`} style={{ width: '38px', height: '38px', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-mid)', borderRadius: '11px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--tx-body)', textDecoration: 'none', flexShrink: 0 }}>
-              <ArrowLeft size={17} strokeWidth={2} />
+          <div style={{ maxWidth: '860px', margin: '0 auto', position: 'relative' }}>
+            <Link href={`/items/${itemId}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: 'var(--tx-muted)', textDecoration: 'none', marginBottom: '20px', fontWeight: '600' }}>
+              <ArrowLeft size={14} strokeWidth={2} /> Back to Item
             </Link>
-            <div>
-              <p style={{ fontSize: '11px', fontWeight: '800', color: '#22A876', textTransform: 'uppercase' as const, letterSpacing: '0.12em', marginBottom: '5px' }}>New Rental</p>
-              <h1 style={{ fontSize: 'clamp(20px,4vw,28px)', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.03em' }}>
-                Request to Rent
-              </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+              <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#6EFF80' }} />
+              <span style={{ fontSize: '11px', fontWeight: '800', color: '#6EFF80', textTransform: 'uppercase' as const, letterSpacing: '0.12em' }}>New Rental</span>
             </div>
+            <h1 style={{ fontSize: 'clamp(22px,4vw,34px)', fontWeight: '900', color: 'var(--tx-bright)', letterSpacing: '-0.04em', margin: 0 }}>Request to Rent</h1>
           </div>
         </div>
 
-        <div className="rn-inner">
+        <div style={{ maxWidth: '860px', margin: '-60px auto 0', padding: '0 28px 60px' }}>
 
-          {error && (
-            <div style={{ marginBottom: '16px', padding: '14px 18px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', color: '#FCA5A5', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              ⚠️ {error}
-            </div>
-          )}
-
-          {/* Item Preview Card */}
-          <div className="rn-card" style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', gap: '18px' }}>
-            <div style={{ width: '64px', height: '64px', background: 'var(--bg-raised)', border: '1px solid var(--border-sub)', borderRadius: '16px', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {item.image_url
-                ? <img src={item.image_url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontSize: '28px' }}>{item.categories?.icon || '📦'}</span>
-              }
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', flexWrap: 'wrap' as const }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 10px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.2)', borderRadius: '999px' }}>
-                  <Tag size={10} color="#22A876" strokeWidth={2} />
-                  <span style={{ fontSize: '10px', fontWeight: '700', color: '#22A876', textTransform: 'uppercase' as const, letterSpacing: '0.06em' }}>{item.categories?.name}</span>
-                </div>
-              </div>
-              <h2 style={{ fontSize: '17px', fontWeight: '800', color: 'var(--tx-bright)', margin: '0 0 4px', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>{item.title}</h2>
-              <p style={{ fontSize: '13px', color: 'var(--tx-muted)', margin: 0 }}>Owner: <span style={{ color: 'var(--tx-body)', fontWeight: '600' }}>{item.profiles?.full_name}</span></p>
-            </div>
-            <div style={{ textAlign: 'right' as const, flexShrink: 0 }}>
-              <p style={{ fontSize: '26px', fontWeight: '900', color: '#2ECC8F', margin: 0, letterSpacing: '-0.04em' }}>₱{item.price_per_day}</p>
-              <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: '2px 0 0' }}>per day</p>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-
-            {/* Dates */}
-            <div className="rn-card" style={{ marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--border-sub)' }}>
-                <div style={{ width: '32px', height: '32px', background: 'var(--g-glow)', border: '1px solid rgba(34,168,118,0.2)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CalendarDays size={16} color="#22A876" strokeWidth={2} />
-                </div>
-                <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Select Dates</h3>
-              </div>
-              <div className="rn-grid">
-                <div>
-                  <label className="rn-label">Start Date</label>
-                  <input
-                    type="date" value={startDate} min={today}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required className="rn-input"
-                  />
-                </div>
-                <div>
-                  <label className="rn-label">End Date</label>
-                  <input
-                    type="date" value={endDate} min={startDate || today}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    required className="rn-input"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Message */}
-            <div className="rn-card" style={{ marginBottom: '14px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid var(--border-sub)' }}>
-                <div style={{ width: '32px', height: '32px', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <MessageSquare size={16} color="#C9A84C" strokeWidth={2} />
-                </div>
-                <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Message <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--tx-muted)' }}>(Optional)</span></h3>
-              </div>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows={3}
-                placeholder="Introduce yourself or ask the owner a question..."
-                style={{ width: '100%', padding: '13px 16px', background: 'var(--bg-raised)', border: '1px solid var(--border-sub)', borderRadius: '12px', fontSize: '14px', color: 'var(--tx-bright)', outline: 'none', resize: 'none' as const, lineHeight: '1.6', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif', boxSizing: 'border-box' as const, transition: 'border-color 0.2s' }}
-                onFocus={e => e.target.style.borderColor = 'rgba(201,168,76,0.4)'}
-                onBlur={e => e.target.style.borderColor = 'var(--border-sub)'}
-              />
-            </div>
-
-            {/* Price Summary */}
-            <div className="rn-summary">
-              <p style={{ fontSize: '11px', fontWeight: '800', color: '#22A876', textTransform: 'uppercase' as const, letterSpacing: '0.1em', marginBottom: '14px' }}>Price Summary</p>
-
-              <div className="rn-summary-row">
-                <span style={{ fontSize: '13px', color: 'var(--tx-muted)', fontWeight: '600' }}>Daily rate</span>
-                <span style={{ fontSize: '13px', color: 'var(--tx-bright)', fontWeight: '700' }}>₱{item.price_per_day}/day</span>
-              </div>
-              <div className="rn-summary-row">
-                <span style={{ fontSize: '13px', color: 'var(--tx-muted)', fontWeight: '600' }}>Duration</span>
-                <span style={{ fontSize: '13px', color: 'var(--tx-bright)', fontWeight: '700' }}>
-                  {totalDays > 0 ? `${totalDays} day${totalDays !== 1 ? 's' : ''}` : 'Select dates'}
-                </span>
-              </div>
-              <div className="rn-total-box">
-                <div>
-                  <p style={{ fontSize: '11px', color: 'var(--tx-muted)', fontWeight: '700', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 4px' }}>Total</p>
-                  <p style={{ fontSize: '11px', color: 'var(--tx-dim)', margin: 0 }}>
-                    {startDate && endDate && totalDays > 0 ? `${startDate} → ${endDate}` : 'Choose dates above'}
-                  </p>
-                </div>
-                <p className={totalDays > 0 ? 'gold-shimmer' : ''} style={{ fontSize: '34px', fontWeight: '900', margin: 0, letterSpacing: '-0.05em', color: totalDays > 0 ? undefined : 'var(--tx-dim)' }}>
-                  {totalDays > 0 ? `₱${totalPrice}` : '--'}
+          {/* Trust tier notices */}
+          {tier === 'low_trust' && (
+            <div style={{ marginBottom: '16px', padding: '14px 18px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <AlertTriangle size={18} color="#EF4444" strokeWidth={2} style={{ flexShrink: 0, marginTop: '1px' }} />
+              <div>
+                <p style={{ fontWeight: '700', fontSize: '13px', color: '#B91C1C', margin: '0 0 4px' }}>Low Trust Restrictions Apply</p>
+                <p style={{ fontSize: '12px', color: '#B91C1C', margin: 0, opacity: 0.8, lineHeight: '1.5' }}>
+                  Your trust score is below 3.0. This rental request will only be visible to the owner after <strong>12 hours</strong>. You can also only have <strong>1 active rental</strong> at a time.
                 </p>
               </div>
             </div>
+          )}
 
-            <button type="submit" disabled={loading || totalDays === 0} className="rn-submit">
-              {loading ? 'Submitting request...' : totalDays === 0 ? 'Select dates to continue' : `Submit Rental Request · ₱${totalPrice}`}
-            </button>
+          {tier === 'low_trust' && !rentalCheck.allowed && (
+            <div style={{ marginBottom: '16px', padding: '14px 18px', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '14px', display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <AlertTriangle size={18} color="#EF4444" strokeWidth={2} style={{ flexShrink: 0, marginTop: '1px' }} />
+              <div>
+                <p style={{ fontWeight: '700', fontSize: '13px', color: '#B91C1C', margin: '0 0 4px' }}>Cannot Create Rental</p>
+                <p style={{ fontSize: '12px', color: '#B91C1C', margin: 0, opacity: 0.8 }}>{rentalCheck.reason}</p>
+              </div>
+            </div>
+          )}
 
-            <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--tx-dim)', marginTop: '14px', lineHeight: '1.6' }}>
-              Your request will be sent to the owner for approval. No payment is collected at this stage.
-            </p>
-          </form>
+          {tier === 'highly_trusted' && (
+            <div style={{ marginBottom: '16px', padding: '14px 18px', background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '14px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <ShieldCheck size={18} color="var(--au-mid)" strokeWidth={2} />
+              <p style={{ fontSize: '13px', color: 'var(--au-dark)', margin: 0, fontWeight: '600' }}>
+                <strong>Highly Trusted</strong> — Your request is instantly visible to the owner with no delays.
+              </p>
+            </div>
+          )}
+
+          {error && <div style={{ marginBottom: '16px', padding: '13px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', color: '#B91C1C', fontSize: '13px' }}>⚠️ {error}</div>}
+
+          <div className="rn-grid">
+            <form onSubmit={handleSubmit}>
+              <div className="rn-card">
+                <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Item</h3>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{ width: '52px', height: '52px', background: 'rgba(4,149,22,0.07)', border: '1px solid rgba(4,149,22,0.14)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Package size={24} color="var(--g-rich)" strokeWidth={1.8} />
+                  </div>
+                  <div>
+                    <p style={{ fontWeight: '800', fontSize: '15px', color: 'var(--tx-bright)', margin: '0 0 3px', letterSpacing: '-0.02em' }}>{item.title}</p>
+                    <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>Owned by {item.profiles?.full_name} · ₱{item.price_per_day}/day</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rn-card">
+                <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '20px' }}>Rental Period</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={labelStyle}>Start Date</label>
+                    <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} required min={new Date().toISOString().split('T')[0]} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>End Date</label>
+                    <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} required min={startDate || new Date().toISOString().split('T')[0]} style={inputStyle} />
+                  </div>
+                </div>
+                {tier === 'low_trust' && startDate && endDate && (
+                  <div style={{ marginTop: '12px', padding: '10px 14px', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Clock size={13} color="#EF4444" strokeWidth={2} />
+                    <p style={{ fontSize: '12px', color: '#B91C1C', margin: 0 }}>
+                      Owner can review this request after{' '}
+                      <strong>{new Date(Date.now() + 12 * 60 * 60 * 1000).toLocaleString('en-PH', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="submit"
+                  disabled={loading || days === 0 || !rentalCheck.allowed}
+                  className="btn-gold"
+                  style={{ fontSize: '15px', padding: '13px 32px', opacity: (loading || days === 0 || !rentalCheck.allowed) ? 0.5 : 1 }}
+                >
+                  {loading ? 'Submitting...' : 'Submit Request'}
+                </button>
+                <Link href={`/items/${itemId}`} className="btn-ghost" style={{ fontSize: '15px', padding: '13px 24px' }}>Cancel</Link>
+              </div>
+            </form>
+
+            <div>
+              <div className="rn-summary" style={{ position: 'relative' }}>
+                <p style={{ fontSize: '11px', fontWeight: '800', color: 'rgba(240,255,242,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '14px' }}>Summary</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {[
+                    { l: 'Item', v: item.title },
+                    { l: 'Price per day', v: `₱${item.price_per_day}` },
+                    { l: 'Duration', v: days > 0 ? `${days} day${days !== 1 ? 's' : ''}` : '—' },
+                  ].map((row, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '13px' }}>
+                      <span style={{ color: 'rgba(240,255,242,0.5)', fontWeight: '600' }}>{row.l}</span>
+                      <span style={{ color: '#F0FFF2', fontWeight: '700', maxWidth: '160px', textAlign: 'right', fontSize: '12px' }}>{row.v}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="rn-total-box">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '13px', fontWeight: '700', color: '#E2C07A' }}>Total</span>
+                    <span style={{ fontSize: '24px', fontWeight: '900', color: '#E2C07A', letterSpacing: '-0.04em' }}>₱{total > 0 ? total : '—'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
-  )
-}
-
-export default function NewRentalPage() {
-  return (
-    <Suspense fallback={<div />}>
-      <RentalForm />
-    </Suspense>
   )
 }

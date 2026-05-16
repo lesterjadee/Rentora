@@ -245,6 +245,11 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
   border: 1px solid rgba(201,168,76,0.3); border-radius: 999px;
   padding: 4px 12px; font-size: 11px; font-weight: 700;
 }
+.status-returning {
+  background: rgba(124,58,237,0.1); color: #6D28D9;
+  border: 1px solid rgba(124,58,237,0.25); border-radius: 999px;
+  padding: 4px 12px; font-size: 11px; font-weight: 700;
+}
 .status-approved {
   background: rgba(59,130,246,0.1); color: #1D4ED8;
   border: 1px solid rgba(59,130,246,0.25); border-radius: 999px;
@@ -261,7 +266,25 @@ select option { background: #FFFFFF; color: var(--tx-bright); }
   border: 1px solid rgba(239,68,68,0.2); border-radius: 999px;
   padding: 4px 12px; font-size: 11px; font-weight: 700;
 }
-
+/* ============================================================
+   TRUST TIER BADGES
+   ============================================================ */
+.badge-highly-trusted {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(226,192,122,0.1));
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 999px; padding: 4px 12px;
+  font-size: 11px; font-weight: 800;
+  color: var(--au-dark); letter-spacing: 0.04em;
+}
+.badge-low-trust {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 999px; padding: 4px 12px;
+  font-size: 11px; font-weight: 800;
+  color: #B91C1C; letter-spacing: 0.04em;
+}
 /* ============================================================
    FOCUS
    ============================================================ */
