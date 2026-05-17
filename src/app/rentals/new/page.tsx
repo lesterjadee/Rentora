@@ -27,7 +27,7 @@ function NewRentalForm() {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (!itemId) { router.push('/items'); return }
+    if (!itemId) return
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }

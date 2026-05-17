@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Eye, EyeOff, LockKeyhole, CheckCircle2, ArrowRight } from 'lucide-react'
 
-export default function ResetPasswordPage() {
+function ResetPasswordPage() {
   const router = useRouter()
   const supabase = createClient()
   const [password, setPassword] = useState('')
