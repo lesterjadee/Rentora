@@ -16,7 +16,7 @@ function getTrustTier(score: number | null | undefined) {
 function NewRentalForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const itemId = searchParams.get('item_id')
+  const itemId = searchParams.get('item_id') || searchParams.get('item')
   const supabase = createClient()
   const [item, setItem] = useState<any>(null)
   const [userProfile, setUserProfile] = useState<any>(null)
