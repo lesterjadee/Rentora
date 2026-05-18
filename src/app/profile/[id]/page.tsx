@@ -137,6 +137,27 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                   {profile.full_name}
                 </h1>
 
+// REPLACE:
+                {/* Verification badge */}
+                {profile.is_verified && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', background: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.25)', borderRadius: '999px', marginBottom: '8px', marginRight: '8px' }}>
+                    <span style={{ fontSize: '12px' }}>✅</span>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#1D4ED8' }}>Verified User</span>
+                  </div>
+                )}
+                {!profile.is_verified && profile.id_image_url && profile.verification_status === 'pending' && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '999px', marginBottom: '8px', marginRight: '8px' }}>
+                    <span style={{ fontSize: '12px' }}>⏳</span>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--au-dark)' }}>Verification Pending</span>
+                  </div>
+                )}
+                {profile.verification_status === 'rejected' && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '999px', marginBottom: '8px', marginRight: '8px' }}>
+                    <span style={{ fontSize: '12px' }}>❌</span>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#B91C1C' }}>Verification Rejected</span>
+                  </div>
+                )}
+
                 {/* Trust tier badge */}
                 <div style={{ marginBottom: '8px' }}>
                   {tier === 'highly_trusted' && (

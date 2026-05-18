@@ -34,11 +34,23 @@ export default function Navbar() {
       }
     }
     getInitialUser()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user)
         fetchProfile(session.user.id)
         fetchNotifCount(session.user.id)
+
+        // Sync ID image from registration metadata to profile (first login)
+        if (event === 'SIGNED_IN') {
+          const meta = session.user.user_metadata
+          if (meta?.id_image_url) {
+            await supabase.from('profiles').update({
+              id_image_url: meta.id_image_url,
+              id_submitted_at: meta.id_submitted_at || new Date().toISOString(),
+              verification_status: 'pending',
+            }).eq('id', session.user.id).is('id_image_url', null)
+          }
+        }
       } else {
         setUser(null)
         setProfile(null)
