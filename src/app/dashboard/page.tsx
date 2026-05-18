@@ -77,7 +77,23 @@ export default async function DashboardPage() {
       `}</style>
 
       <div className="dash">
-        <RealtimeRentals userId={user.id} />
+<RealtimeRentals userId={user.id} />
+
+        {/* ID Upload Banner — shown if no ID uploaded yet */}
+        {!profile?.id_image_url && (
+          <div style={{ background: 'rgba(201,168,76,0.08)', border: '1.5px solid rgba(201,168,76,0.28)', borderRadius: '0', padding: '14px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '20px' }}>🪪</span>
+              <div>
+                <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--au-dark)', margin: '0 0 2px' }}>ID Verification Required</p>
+                <p style={{ fontSize: '13px', color: 'var(--au-dark)', margin: 0, opacity: 0.8 }}>Upload your school ID or government ID to get verified on Rentora.</p>
+              </div>
+            </div>
+            <Link href="/upload-id" className="btn-gold" style={{ fontSize: '13px', padding: '10px 20px', whiteSpace: 'nowrap' as const }}>
+              Upload ID Now →
+            </Link>
+          </div>
+        )}
 
         <div className="dash-banner">
           <div className="dash-inner">
