@@ -1,5 +1,8 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect, notFound } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Star, Package, MessageSquare, ArrowUpRight, ShieldCheck } from 'lucide-react'
 import { CategoryIcon } from '@/lib/categoryIcon'
@@ -11,25 +14,51 @@ function getTrustTier(score: number | null) {
   return 'low_trust'
 }
 
-export default async function ProfilePage({ params }: { params: { id: string } }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/auth/login')
+export default function ProfilePage() {
+  const params = useParams()
+  const router = useRouter()
+  const profileId = params.id as string
+  const supabase = createClient()
 
-  const { data: profile } = await supabase
-    .from('profiles').select('*').eq('id', params.id).single()
-  if (!profile) notFound()
+  const [profile, setProfile]   = useState<any>(null)
+  const [items, setItems]       = useState<any[]>([])
+  const [reviews, setReviews]   = useState<any[]>([])
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [loading, setLoading]   = useState(true)
 
-  const { data: items } = await supabase
-    .from('items').select('*, categories(name, icon)')
-    .eq('owner_id', params.id).order('created_at', { ascending: false })
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { router.push('/auth/login'); return }
+      setCurrentUser(user)
 
-  const { data: reviews } = await supabase
-    .from('reviews')
-    .select('*, reviewer:profiles!reviews_reviewer_id_fkey(full_name)')
-    .eq('reviewee_id', params.id).order('created_at', { ascending: false })
+      const [{ data: profileData }, { data: itemsData }, { data: reviewsData }] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', profileId).single(),
+        supabase.from('items').select('*, categories(name, icon)').eq('owner_id', profileId).order('created_at', { ascending: false }),
+        supabase.from('reviews').select('*, reviewer:profiles!reviews_reviewer_id_fkey(full_name)').eq('reviewee_id', profileId).order('created_at', { ascending: false }),
+      ])
 
-  const isOwnProfile = user.id === params.id
+      if (!profileData) { router.push('/dashboard'); return }
+
+      setProfile(profileData)
+      setItems(itemsData || [])
+      setReviews(reviewsData || [])
+      setLoading(false)
+    }
+    init()
+  }, [profileId])
+
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg-void)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>
+      <div style={{ width: '52px', height: '52px', background: 'rgba(4,149,22,0.06)', border: '1px solid rgba(4,149,22,0.12)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Package size={24} color="var(--g-rich)" strokeWidth={1.5} />
+      </div>
+    </div>
+  )
+
+  if (!profile) return null
+
+  const isOwnProfile = currentUser?.id === profileId
   const tier = getTrustTier(profile.trust_score)
 
   return (
@@ -41,7 +70,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         .prof-banner::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.22), transparent); }
         .prof-avatar { width: 80px; height: 80px; background: linear-gradient(135deg, var(--g-deep), var(--g-dark), var(--g-mid)); border: 3px solid rgba(4,149,22,0.3); border-radius: 22px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; font-weight: 900; font-size: 32px; flex-shrink: 0; box-shadow: 0 0 24px rgba(4,149,22,0.15), var(--shadow-lg); }
         .prof-stats { background: #FFFFFF; border: 1.5px solid rgba(4,149,22,0.15); border-radius: 20px; display: flex; overflow: hidden; box-shadow: var(--shadow-lg); }
-        .prof-stat { flex: 1; padding: 22px 20px; text-align: center; border-right: 1px solid rgba(4,149,22,0.08); transition: background 0.2s; }
+        .prof-stat { flex: 1; padding: 22px 20px; text-align: center; border-right: 1px solid rgba(4,149,22,0.08); transition: background 0.2s; cursor: default; }
         .prof-stat:last-child { border-right: none; }
         .prof-stat:hover { background: var(--bg-raised); }
         .prof-section { background: #FFFFFF; border: 1.5px solid rgba(4,149,22,0.1); border-radius: 22px; padding: 28px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
@@ -59,25 +88,28 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <div className="prof-banner">
           <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '20px', flexWrap: 'wrap' }}>
-              <div className="prof-avatar">{profile.full_name?.charAt(0)?.toUpperCase() || 'U'}</div>
-              <div style={{ flex: 1 }}>
+              <div className="prof-avatar">
+                {profile.full_name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                   <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#6EFF80' }} />
                   <span style={{ fontSize: '11px', fontWeight: '800', color: '#6EFF80', textTransform: 'uppercase' as const, letterSpacing: '0.12em' }}>Gordon College</span>
                 </div>
+
                 <h1 style={{ fontSize: 'clamp(22px,5vw,36px)', fontWeight: '900', color: 'var(--tx-bright)', letterSpacing: '-0.04em', margin: '0 0 10px' }}>
-                  {profile.full_name}
+                  {profile.full_name || 'Unknown User'}
                 </h1>
 
-                {/* Badges row */}
+                {/* Badges */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                  {/* Verification badge */}
                   {profile.is_verified && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.28)', borderRadius: '999px', fontSize: '12px', fontWeight: '800', color: '#1D4ED8' }}>
                       <ShieldCheck size={12} strokeWidth={2.5} /> Verified User
                     </span>
                   )}
-                  {!profile.is_verified && profile.id_image_url && profile.verification_status === 'pending' && (
+                  {!profile.is_verified && profile.id_image_url && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.25)', borderRadius: '999px', fontSize: '12px', fontWeight: '800', color: 'var(--au-dark)' }}>
                       ⏳ Verification Pending
                     </span>
@@ -87,8 +119,6 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                       ❌ Verification Rejected
                     </span>
                   )}
-
-                  {/* Trust tier badge */}
                   {tier === 'highly_trusted' && (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 12px', background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: '999px', fontSize: '12px', fontWeight: '800', color: 'var(--au-dark)' }}>
                       ★ Highly Trusted
@@ -102,14 +132,21 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                 </div>
 
                 <p style={{ fontSize: '13px', color: 'var(--tx-muted)', margin: 0 }}>
-                  {profile.student_id && `${profile.student_id} · `}{profile.email}
+                  {profile.student_id ? `${profile.student_id} · ` : ''}{profile.email}
                 </p>
               </div>
 
               {isOwnProfile && (
-                <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 18px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: '10px', color: 'var(--tx-muted)', fontWeight: '600', fontSize: '13px', textDecoration: 'none' }}>
-                  Dashboard
-                </Link>
+                <div style={{ display: 'flex', gap: '10px', flexShrink: 0 }}>
+                  {!profile.id_image_url && (
+                    <Link href="/upload-id" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 18px', background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.28)', borderRadius: '10px', color: 'var(--au-dark)', fontWeight: '700', fontSize: '13px', textDecoration: 'none' }}>
+                      🪪 Upload ID
+                    </Link>
+                  )}
+                  <Link href="/dashboard" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 18px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: '10px', color: 'var(--tx-muted)', fontWeight: '600', fontSize: '13px', textDecoration: 'none' }}>
+                    Dashboard
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -120,8 +157,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           {/* Stats */}
           <div className="prof-stats" style={{ marginBottom: '20px' }}>
             {[
-              { label: 'Items Listed', value: items?.length || 0,   icon: <Package size={16} color="var(--g-rich)" strokeWidth={1.8} /> },
-              { label: 'Reviews',      value: reviews?.length || 0, icon: <MessageSquare size={16} color="var(--g-rich)" strokeWidth={1.8} /> },
+              { label: 'Items Listed', value: items.length,   icon: <Package size={16} color="var(--g-rich)" strokeWidth={1.8} /> },
+              { label: 'Reviews',      value: reviews.length, icon: <MessageSquare size={16} color="var(--g-rich)" strokeWidth={1.8} /> },
               { label: 'Trust Score',  value: profile.trust_score ? Number(profile.trust_score).toFixed(1) : '—', icon: <Star size={16} fill="#C9A84C" color="#C9A84C" strokeWidth={1} /> },
             ].map((s, i) => (
               <div key={i} className="prof-stat">
@@ -132,7 +169,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
             ))}
           </div>
 
-          {/* Trust Score */}
+          {/* Trust Score Details */}
           {profile.trust_score > 0 && (
             <div className="prof-section">
               <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>Trust Score</h3>
@@ -145,7 +182,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                     <div className="prof-progress-fill" style={{ width: `${Math.min((profile.trust_score / 5) * 100, 100)}%` }} />
                   </div>
                   <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: '6px 0 0' }}>
-                    Based on {reviews?.length || 0} review{reviews?.length !== 1 ? 's' : ''}
+                    Based on {reviews.length} review{reviews.length !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
@@ -158,7 +195,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           )}
 
           {/* Listed Items */}
-          {items && items.length > 0 && (
+          {items.length > 0 && (
             <div className="prof-section">
               <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>
                 Listed Items ({items.length})
@@ -184,7 +221,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
           )}
 
           {/* Reviews */}
-          {reviews && reviews.length > 0 && (
+          {reviews.length > 0 && (
             <div className="prof-section">
               <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--tx-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '16px' }}>
                 Reviews ({reviews.length})
@@ -211,18 +248,20 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                         </div>
                       ))}
                     </div>
-                    {review.comment && <p style={{ fontSize: '13px', color: 'var(--tx-muted)', margin: 0, lineHeight: '1.6' }}>{review.comment}</p>}
+                    {review.comment && (
+                      <p style={{ fontSize: '13px', color: 'var(--tx-muted)', margin: 0, lineHeight: '1.6' }}>{review.comment}</p>
+                    )}
                   </div>
                 )
               })}
             </div>
           )}
 
-          {(!items || items.length === 0) && (!reviews || reviews.length === 0) && (
+          {items.length === 0 && reviews.length === 0 && (
             <div style={{ background: '#FFFFFF', border: '1.5px solid rgba(4,149,22,0.1)', borderRadius: '22px', padding: '60px 24px', textAlign: 'center', boxShadow: 'var(--shadow-sm)' }}>
               <Package size={32} color="var(--tx-dim)" strokeWidth={1.5} style={{ margin: '0 auto 14px', display: 'block' }} />
               <p style={{ fontWeight: '700', fontSize: '16px', color: 'var(--tx-body)', marginBottom: '6px' }}>No activity yet</p>
-              <p style={{ fontSize: '13px', color: 'var(--tx-muted)' }}>This user hasn't listed any items or received reviews yet.</p>
+              <p style={{ fontSize: '13px', color: 'var(--tx-muted)' }}>No items listed or reviews received yet.</p>
             </div>
           )}
         </div>
