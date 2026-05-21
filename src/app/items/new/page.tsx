@@ -186,8 +186,8 @@ export default function NewItemPage() {
                     <div style={{ width: '56px', height: '56px', background: 'var(--bg-hover)', border: '1px solid var(--border-mid)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
                       <Camera size={24} color="var(--tx-muted)" strokeWidth={1.5} />
                     </div>
-                    <p style={{ fontSize: '14px', fontWeight: '700', color: 'var(--tx-body)', marginBottom: '4px' }}>Click to upload a photo</p>
-                    <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>PNG, JPG up to 10MB</p>
+                  <p style={{ fontWeight: '700', fontSize: '14px', color: 'var(--tx-bright)', margin: 0 }}>Click to upload photo <span style={{ color: '#EF4444' }}>*</span></p>
+                  <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>Required · PNG, JPG up to 10MB</p>
                   </>
                 )}
                 <input type="file" accept="image/*" onChange={handleImageChange} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', width: '100%', height: '100%' }} />
@@ -278,10 +278,14 @@ export default function NewItemPage() {
               )}
             </div>
 
-            <button type="submit" disabled={loading} className="ni-submit">
-              <ImagePlus size={20} strokeWidth={2} />
-              {loading ? 'Listing item...' : 'Publish Listing'}
-            </button>
+              <button type="submit" disabled={loading || !imageFile} className="btn-gold" style={{ fontSize: '15px', padding: '13px 32px', opacity: (loading || !imageFile) ? 0.6 : 1 }}>
+                {loading ? 'Publishing...' : 'Publish Listing'}
+              </button>
+              {!imageFile && (
+                <p style={{ fontSize: '12px', color: '#EF4444', marginTop: '8px', fontWeight: '600' }}>
+                  ⚠ A photo is required before publishing.
+                </p>
+              )}
           </form>
         </div>
       </div>

@@ -32,6 +32,13 @@ export default function RegisterPage() {
       setError('You must agree to the Terms and Conditions before creating an account.')
       setLoading(false); return
     }
+    const hasMinLength = password.length >= 8
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasSymbol = /[!@#$%^&*(),.?":{}|<>_\-+=]/.test(password)
+    if (!hasMinLength || !hasUppercase || !hasSymbol) {
+      setError('Password must be at least 8 characters, include 1 capital letter, and 1 symbol.')
+      setLoading(false); return
+    }
 
     const { error: signUpError } = await supabase.auth.signUp({
       email, password,
@@ -172,11 +179,27 @@ export default function RegisterPage() {
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: 'var(--tx-muted)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Password</label>
                 <div style={{ position: 'relative' }}>
-                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required placeholder="Min. 6 characters" minLength={6} className="reg-input" style={{ paddingRight: '48px' }} />
+                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required placeholder="Min. 8 characters" className="reg-input" style={{ paddingRight: '48px' }} />
                   <button type="button" className="pw-btn" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <EyeOff size={17} strokeWidth={2} /> : <Eye size={17} strokeWidth={2} />}
                   </button>
                 </div>
+                {password.length > 0 && (
+                  <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    {[
+                      { label: 'At least 8 characters', met: password.length >= 8 },
+                      { label: 'At least 1 capital letter (A-Z)', met: /[A-Z]/.test(password) },
+                      { label: 'At least 1 symbol (!@#$%^&*)', met: /[!@#$%^&*(),.?":{}|<>_\-+=]/.test(password) },
+                    ].map((rule, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '16px', height: '16px', borderRadius: '50%', background: rule.met ? 'rgba(4,149,22,0.12)' : 'rgba(0,0,0,0.06)', border: `1.5px solid ${rule.met ? 'rgba(4,149,22,0.4)' : 'rgba(0,0,0,0.15)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
+                          {rule.met && <span style={{ fontSize: '9px', color: 'var(--g-rich)', fontWeight: '900' }}>✓</span>}
+                        </div>
+                        <span style={{ fontSize: '12px', color: rule.met ? 'var(--g-rich)' : 'var(--tx-muted)', fontWeight: rule.met ? '700' : '500', transition: 'all 0.2s' }}>{rule.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div style={{ marginBottom: '22px', padding: '14px 16px', background: 'var(--bg-raised)', borderRadius: '12px', border: '1.5px solid rgba(4,149,22,0.1)' }}>
