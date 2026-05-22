@@ -4,10 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import {
-  ShoppingBag, PlusCircle, ClipboardList,
-  Sparkles, Bell, Star, Menu, X, LogIn
-} from 'lucide-react'
+import { ShoppingBag, PlusCircle, ClipboardList, Sparkles, Bell, Star, Menu, X, LogIn, MessageCircle } from 'lucide-react'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -80,10 +77,11 @@ export default function Navbar() {
   if (!mounted) return null
   if (isAuthPage) return null
 
-  const navLinks = [
+ const navLinks = [
     { href: '/items',           label: 'Browse',    icon: <ShoppingBag size={14} strokeWidth={2} /> },
     { href: '/items/new',       label: 'List Item',  icon: <PlusCircle size={14} strokeWidth={2} /> },
     { href: '/rentals',         label: 'Rentals',    icon: <ClipboardList size={14} strokeWidth={2} /> },
+    { href: '/messages',        label: 'Messages',   icon: <MessageCircle size={14} strokeWidth={2} /> },
     { href: '/recommendations', label: 'For You',    icon: <Sparkles size={14} strokeWidth={2} /> },
   ]
 
