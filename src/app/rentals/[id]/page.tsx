@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { ArrowLeft, Package, Calendar, User, Star, DollarSign, Clock, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Package, Calendar, User, Star, DollarSign, Clock, AlertTriangle, MapPin, ExternalLink } from 'lucide-react'
 
 function getTrustTier(score: number | null) {
   if (!score || score === 0) return 'normal'
@@ -13,17 +14,27 @@ function getTrustTier(score: number | null) {
   return 'low_trust'
 }
 
+// Load map only on client — avoids SSR window errors
+const MapDisplay = dynamic(() => import('@/components/MapDisplayInner'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ height: '240px', background: 'var(--bg-raised)', borderRadius: '14px', border: '1.5px solid rgba(4,149,22,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontSize: '13px', color: 'var(--tx-muted)', fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif' }}>Loading map...</p>
+    </div>
+  ),
+})
+
 export default function RentalDetailPage() {
   const params = useParams()
   const router = useRouter()
   const rentalId = params.id as string
   const supabase = createClient()
 
-  const [rental, setRental] = useState<any>(null)
+  const [rental, setRental]           = useState<any>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading]         = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError]             = useState('')
 
   const fetchData = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -56,17 +67,9 @@ export default function RentalDetailPage() {
   const doAction = async (updates: Record<string, any>) => {
     setActionLoading(true)
     setError('')
-    const { error } = await supabase
-      .from('rentals')
-      .update(updates)
-      .eq('id', rentalId)
-    if (error) {
-      setError(error.message)
-      setActionLoading(false)
-    } else {
-      await fetchData()
-      setActionLoading(false)
-    }
+    const { error } = await supabase.from('rentals').update(updates).eq('id', rentalId)
+    if (error) { setError(error.message); setActionLoading(false) }
+    else { await fetchData(); setActionLoading(false) }
   }
 
   if (loading) return (
@@ -91,8 +94,10 @@ export default function RentalDetailPage() {
     : 1
   const total = days * (rental.items?.price_per_day || 0)
 
-  const renterScore = rental.renter?.trust_score || 0
+  const renterScore    = rental.renter?.trust_score || 0
   const renterIsLowTrust = renterScore > 0 && renterScore < 3.0
+
+  const hasMeetup = rental.meetup_lat && rental.meetup_lng
 
   return (
     <>
@@ -114,6 +119,8 @@ export default function RentalDetailPage() {
         .notice-red    { background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.18); }
         .notice-green  { background: rgba(4,149,22,0.07);  border: 1px solid rgba(4,149,22,0.18);  align-items: center; }
         .notice-purple { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); align-items: center; }
+        .gmaps-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; background: rgba(4,149,22,0.08); border: 1.5px solid rgba(4,149,22,0.22); color: var(--g-rich); font-weight: 700; font-size: 13px; border-radius: 11px; text-decoration: none; transition: all 0.2s; }
+        .gmaps-btn:hover { background: rgba(4,149,22,0.14); }
       `}</style>
 
       <div className="rd">
@@ -143,34 +150,32 @@ export default function RentalDetailPage() {
             </div>
           )}
 
-          {/* Owner: 12-hour delay still active */}
+          {/* Delay notice */}
           {isStillDelayed && visibleAt && (
             <div className="notice notice-gold">
               <Clock size={20} color="var(--au-mid)" strokeWidth={2} style={{ flexShrink: 0, marginTop: '1px' }} />
               <div>
                 <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--au-dark)', margin: '0 0 4px' }}>12-Hour Review Delay Active</p>
                 <p style={{ fontSize: '13px', color: 'var(--au-dark)', margin: 0, opacity: 0.85, lineHeight: '1.5' }}>
-                  This renter has a low trust score. You can approve or decline this request from{' '}
+                  This renter has a low trust score. You can approve from{' '}
                   <strong>{visibleAt.toLocaleString('en-PH', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong>.
                 </p>
               </div>
             </div>
           )}
 
-          {/* Owner: low trust warning after delay */}
+          {/* Low trust warning */}
           {isOwner && renterIsLowTrust && !isStillDelayed && rental.status === 'pending' && (
             <div className="notice notice-red">
               <AlertTriangle size={18} color="#EF4444" strokeWidth={2} style={{ flexShrink: 0, marginTop: '1px' }} />
               <div>
                 <p style={{ fontWeight: '700', fontSize: '13px', color: '#B91C1C', margin: '0 0 3px' }}>Low Trust Renter</p>
-                <p style={{ fontSize: '12px', color: '#B91C1C', margin: 0, opacity: 0.85 }}>
-                  This renter has a trust score below 3.0. Review carefully before approving.
-                </p>
+                <p style={{ fontSize: '12px', color: '#B91C1C', margin: 0, opacity: 0.85 }}>This renter has a trust score below 3.0. Review carefully before approving.</p>
               </div>
             </div>
           )}
 
-          {/* Renter: waiting for owner to confirm return */}
+          {/* Returning notices */}
           {isRenter && rental.status === 'returning' && (
             <div className="notice notice-purple">
               <Package size={17} color="#6D28D9" strokeWidth={2} />
@@ -179,8 +184,6 @@ export default function RentalDetailPage() {
               </p>
             </div>
           )}
-
-          {/* Owner: renter says they returned it */}
           {isOwner && rental.status === 'returning' && (
             <div className="notice notice-green">
               <Package size={17} color="var(--g-rich)" strokeWidth={2} />
@@ -245,31 +248,79 @@ export default function RentalDetailPage() {
             ))}
           </div>
 
+          {/* Meetup Location */}
+          {hasMeetup && (
+            <div className="rd-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div className="rd-icon"><MapPin size={16} color="var(--g-rich)" strokeWidth={2} /></div>
+                  <div>
+                    <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--tx-bright)', margin: '0 0 2px' }}>Meetup Location</h3>
+                    <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>Agreed item handoff point</p>
+                  </div>
+                </div>
+                
+                  href={`https://www.google.com/maps?q=${rental.meetup_lat},${rental.meetup_lng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="gmaps-btn"
+                <a>
+                  <ExternalLink size={13} strokeWidth={2} />
+                  Google Maps
+                </a>
+              </div>
+
+              {/* Map */}
+              <MapDisplay
+                lat={rental.meetup_lat}
+                lng={rental.meetup_lng}
+                name={rental.meetup_location_name}
+              />
+
+              {/* Address */}
+              {rental.meetup_location_name && (
+                <div style={{ marginTop: '12px', padding: '10px 14px', background: 'var(--bg-raised)', borderRadius: '10px', border: '1px solid rgba(4,149,22,0.08)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                  <MapPin size={14} color="var(--g-rich)" strokeWidth={2} style={{ flexShrink: 0, marginTop: '1px' }} />
+                  <div>
+                    <p style={{ fontSize: '13px', color: 'var(--tx-body)', margin: '0 0 3px', fontWeight: '600', lineHeight: '1.5' }}>{rental.meetup_location_name}</p>
+                    <p style={{ fontSize: '11px', color: 'var(--tx-dim)', margin: 0 }}>
+                      {Number(rental.meetup_lat).toFixed(5)}, {Number(rental.meetup_lng).toFixed(5)}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* No meetup set */}
+          {!hasMeetup && (
+            <div style={{ background: '#FFFFFF', border: '1.5px solid rgba(4,149,22,0.08)', borderRadius: '22px', padding: '20px 24px', boxShadow: 'var(--shadow-sm)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '36px', height: '36px', background: 'var(--bg-raised)', border: '1px solid rgba(4,149,22,0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <MapPin size={16} color="var(--tx-dim)" strokeWidth={1.8} />
+              </div>
+              <div>
+                <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tx-muted)', margin: '0 0 2px' }}>No meetup location set</p>
+                <p style={{ fontSize: '12px', color: 'var(--tx-dim)', margin: 0 }}>The renter did not specify a handoff location for this rental.</p>
+              </div>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
 
-            {/* OWNER: approve/decline — only if delay has passed */}
+            {/* OWNER: approve/decline */}
             {isOwner && rental.status === 'pending' && !isStillDelayed && (
               <>
-                <button
-                  disabled={actionLoading}
-                  onClick={() => doAction({ status: 'approved' })}
-                  className="btn-green"
-                  style={{ fontSize: '14px', padding: '12px 24px', opacity: actionLoading ? 0.6 : 1 }}
-                >
+                <button disabled={actionLoading} onClick={() => doAction({ status: 'approved' })} className="btn-green" style={{ fontSize: '14px', padding: '12px 24px', opacity: actionLoading ? 0.6 : 1 }}>
                   {actionLoading ? 'Processing...' : '✓ Approve Request'}
                 </button>
-                <button
-                  disabled={actionLoading}
-                  onClick={() => doAction({ status: 'declined' })}
-                  className="btn-danger"
-                >
+                <button disabled={actionLoading} onClick={() => doAction({ status: 'declined' })} className="btn-danger">
                   Decline
                 </button>
               </>
             )}
 
-            {/* OWNER: delay still active — disabled button */}
+            {/* OWNER: delayed */}
             {isOwner && rental.status === 'pending' && isStillDelayed && (
               <button disabled style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', background: 'rgba(0,0,0,0.04)', border: '1.5px solid var(--border-sub)', color: 'var(--tx-dim)', fontWeight: '600', fontSize: '14px', borderRadius: '12px', cursor: 'not-allowed', fontFamily: 'inherit' }}>
                 <Clock size={15} strokeWidth={2} /> Awaiting Delay Period
@@ -278,35 +329,21 @@ export default function RentalDetailPage() {
 
             {/* OWNER: confirm return */}
             {isOwner && rental.status === 'returning' && (
-              <button
-                disabled={actionLoading}
-                onClick={() => doAction({ status: 'completed' })}
-                className="btn-green"
-                style={{ fontSize: '14px', padding: '12px 24px', opacity: actionLoading ? 0.6 : 1 }}
-              >
+              <button disabled={actionLoading} onClick={() => doAction({ status: 'completed' })} className="btn-green" style={{ fontSize: '14px', padding: '12px 24px', opacity: actionLoading ? 0.6 : 1 }}>
                 {actionLoading ? 'Processing...' : '✓ Confirm Item Returned'}
               </button>
             )}
 
-            {/* RENTER: cancel pending */}
+            {/* RENTER: cancel */}
             {isRenter && rental.status === 'pending' && (
-              <button
-                disabled={actionLoading}
-                onClick={() => doAction({ status: 'cancelled' })}
-                className="btn-danger"
-              >
+              <button disabled={actionLoading} onClick={() => doAction({ status: 'cancelled' })} className="btn-danger">
                 Cancel Request
               </button>
             )}
 
-            {/* RENTER: mark as returned */}
+            {/* RENTER: mark returned */}
             {isRenter && rental.status === 'approved' && (
-              <button
-                disabled={actionLoading}
-                onClick={() => doAction({ status: 'returning', return_requested_at: new Date().toISOString() })}
-                className="btn-purple"
-                style={{ opacity: actionLoading ? 0.6 : 1 }}
-              >
+              <button disabled={actionLoading} onClick={() => doAction({ status: 'returning', return_requested_at: new Date().toISOString() })} className="btn-purple" style={{ opacity: actionLoading ? 0.6 : 1 }}>
                 {actionLoading ? 'Processing...' : '📦 I Have Returned the Item'}
               </button>
             )}
