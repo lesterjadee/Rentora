@@ -112,13 +112,11 @@ export default function RegisterPage() {
       <div className="reg">
         <div className="reg-left">
           <div style={{ position: 'relative' }}>
-            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '48px' }}>
-              <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, var(--g-deep), var(--g-dark), var(--g-mid))', border: '1.5px solid rgba(4,149,22,0.3)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img src="/gcoc.png" alt="GC" style={{ width: '26px', height: '26px', objectFit: 'contain' }} />
-              </div>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '56px' }}>
+              <img src="/gcoc.png" alt="⚡ Powered by Gordon College" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
               <div>
-                <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0 }}>Rentora</p>
-                <p style={{ fontSize: '9px', color: 'var(--g-vivid)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>⚡ Powered by Gordon College</p>
+                <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Rentora</p>
+                <p style={{ fontSize: '11px', color: 'var(--g-bright)', margin: 0, fontWeight: '600' }}>⚡ Powered by Gordon College</p>
               </div>
             </Link>
             <h2 style={{ fontSize: 'clamp(28px,4vw,36px)', fontWeight: '900', color: 'var(--tx-bright)', lineHeight: '1.15', letterSpacing: '-0.04em', marginBottom: '14px' }}>
@@ -142,14 +140,12 @@ export default function RegisterPage() {
         </div>
 
         <div className="reg-right">
-          <div style={{ width: '100%', maxWidth: '420px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>
-              <div style={{ width: '34px', height: '34px', background: 'linear-gradient(135deg, var(--g-deep), var(--g-dark), var(--g-mid))', border: '1.5px solid rgba(4,149,22,0.25)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                <img src="/gcoc.png" alt="GC" style={{ width: '24px', height: '24px', objectFit: 'contain' }} />
-              </div>
+          <div style={{ width: '100%', maxWidth: '400px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '40px' }}>
+              <img src="/gcoc.png" alt="⚡ Powered by Gordon College" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
               <div>
-                <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0 }}>Rentora</p>
-                <p style={{ fontSize: '9px', color: 'var(--g-vivid)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Gordon College</p>
+                <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Rentora</p>
+                <p style={{ fontSize: '10px', color: 'var(--g-bright)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em' }}>⚡ Powered by Gordon College</p>
               </div>
             </div>
 

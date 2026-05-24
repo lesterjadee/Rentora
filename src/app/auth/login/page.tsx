@@ -86,7 +86,7 @@ export default function LoginPage() {
               <img src="/gcoc.png" alt="⚡ Powered by Gordon College" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
               <div>
                 <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Rentora</p>
-                <p style={{ fontSize: '10px', color: 'var(--g-bright)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Gordon College</p>
+                <p style={{ fontSize: '10px', color: 'var(--g-bright)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em' }}>⚡ Powered by Gordon College</p>
               </div>
             </div>
 
