@@ -279,9 +279,11 @@ export default function RentalDetailPage() {
             ].map((p, i) => (
               <div key={i} className="rd-row">
                 <div className="rd-icon"><User size={16} color="var(--g-rich)" strokeWidth={2} /></div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: '700', color: 'var(--tx-bright)', margin: 0 }}>{p.profile?.full_name}</p>
-                  <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>{p.label}</p>
+               <div>
+                  <Link href={`/profile/${p.profile?.id}`} style={{ fontSize: '13px', fontWeight: '800', color: 'var(--g-rich)', margin: 0, textDecoration: 'none', display: 'block' }}>
+                    {p.profile?.full_name}
+                  </Link>
+                  <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>{p.label} · view profile</p>
                 </div>
                 {p.profile?.trust_score > 0 && (
                   <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 10px', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.22)', borderRadius: '999px' }}>

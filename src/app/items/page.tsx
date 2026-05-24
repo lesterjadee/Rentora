@@ -169,7 +169,7 @@ export default function ItemsPage() {
                           <span style={{ fontSize: '11px', color: 'var(--tx-muted)' }}>/day</span>
                         </div>
                         <div style={{ textAlign: 'right' as const }}>
-                          <Link href={`/profile/${item.profiles?.id || ''}`} onClick={e => e.stopPropagation()} style={{ fontSize: '11px', color: 'var(--g-rich)', margin: 0, fontWeight: '700', textDecoration: 'none' }}>
+                          <Link href={`/profile/${item.profiles?.id}`} onClick={e => e.stopPropagation()} style={{ fontSize: '11px', color: 'var(--g-rich)', margin: 0, fontWeight: '700', textDecoration: 'none' }} tabIndex={-1}>
                             {item.profiles?.full_name}
                           </Link>
                           {item.profiles?.trust_score > 0 && (

@@ -148,8 +148,10 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                       {item.profiles?.full_name?.charAt(0)}
                     </div>
                     <div>
-                      <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--tx-bright)', margin: '0 0 3px', letterSpacing: '-0.01em' }}>{item.profiles?.full_name}</p>
-                      <p style={{ fontSize: '12px', color: 'var(--tx-muted)', margin: 0 }}>College Student</p>
+                      <Link href={`/profile/${item.profiles?.id}`} style={{ fontWeight: '800', fontSize: '13px', color: 'var(--g-rich)', margin: 0, textDecoration: 'none' }}>
+                            {item.profiles?.full_name}
+                          </Link>
+                          <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: 0 }}>Tap to view profile</p>
                     </div>
                     {item.profiles?.trust_score > 0 && (
                       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 11px', background: 'var(--au-glow)', border: '1px solid rgba(201,168,76,0.2)', borderRadius: '999px' }}>
