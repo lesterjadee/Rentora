@@ -116,7 +116,7 @@ export default function UploadIdPage() {
             </div>
             <div>
               <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0 }}>Rentora</p>
-              <p style={{ fontSize: '9px', color: 'var(--g-vivid)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Gordon College</p>
+              <p style={{ fontSize: '9px', color: 'var(--g-vivid)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em' }}>⚡ Powered by Gordon College</p>
             </div>
           </div>
 

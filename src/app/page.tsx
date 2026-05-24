@@ -155,7 +155,7 @@ export default async function Home() {
               </p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#6EFF80', boxShadow: '0 0 6px rgba(110,255,128,0.6)', animation: 'breathe 2s ease infinite' }} />
-                <span style={{ fontSize: '11px', fontWeight: '700', color: '#6EFF80', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Gordon College · Official Rental Hub</span>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#6EFF80', textTransform: 'uppercase', letterSpacing: '0.1em' }}>⚡ Powered by Gordon College · Official Rental Hub</span>
               </div>
             </div>
             {!user && (

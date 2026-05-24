@@ -158,7 +158,7 @@ export default function Navbar() {
             {/* Wordmark */}
             <div className="nav-logo-wordmark">
               <span className="nav-logo-text">Rentora</span>
-              <span className="nav-logo-sub">Gordon College</span>
+              <span className="nav-logo-sub">⚡ Powered by Gordon College</span>
             </div>
 
             {/* Gordon College logo — no border, no background */}
