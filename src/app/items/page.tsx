@@ -31,7 +31,7 @@ export default function ItemsPage() {
     const now = new Date().toISOString()
 
     let query = supabase.from('items')
-      .select('*, profiles(full_name, trust_score), categories(name, icon)')
+  .select('*, profiles(id, full_name, trust_score), categories(name, icon)')
       .eq('status', 'available')
       .order('created_at', { ascending: false })
 
@@ -169,7 +169,9 @@ export default function ItemsPage() {
                           <span style={{ fontSize: '11px', color: 'var(--tx-muted)' }}>/day</span>
                         </div>
                         <div style={{ textAlign: 'right' as const }}>
-                          <p style={{ fontSize: '11px', color: 'var(--tx-muted)', margin: 0, fontWeight: '600' }}>{item.profiles?.full_name}</p>
+                          <Link href={`/profile/${item.profiles?.id || ''}`} onClick={e => e.stopPropagation()} style={{ fontSize: '11px', color: 'var(--g-rich)', margin: 0, fontWeight: '700', textDecoration: 'none' }}>
+                            {item.profiles?.full_name}
+                          </Link>
                           {item.profiles?.trust_score > 0 && (
                             <div className="item-trust" style={{ marginTop: '3px', display: 'inline-flex' }}>
                               <Star size={10} fill="#C9A84C" color="#C9A84C" strokeWidth={1} />
