@@ -51,10 +51,10 @@ export default function LoginPage() {
         <div className="login-left">
           <div style={{ position: 'relative' }}>
             <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '56px' }}>
-              <img src="/gcoc.png" alt="Gordon College" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
+              <img src="/gcoc.png" alt="⚡ Powered by Gordon College" style={{ width: '42px', height: '42px', objectFit: 'contain' }} />
               <div>
                 <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Rentora</p>
-                <p style={{ fontSize: '11px', color: 'var(--g-bright)', margin: 0, fontWeight: '600' }}>Gordon College</p>
+                <p style={{ fontSize: '11px', color: 'var(--g-bright)', margin: 0, fontWeight: '600' }}>⚡ Powered by Gordon College</p>
               </div>
             </Link>
             <h2 style={{ fontSize: 'clamp(28px,4vw,38px)', fontWeight: '900', color: 'var(--tx-bright)', lineHeight: '1.12', letterSpacing: '-0.04em', marginBottom: '16px' }}>
@@ -83,7 +83,7 @@ export default function LoginPage() {
         <div className="login-right">
           <div style={{ width: '100%', maxWidth: '400px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '40px' }}>
-              <img src="/gcoc.png" alt="Gordon College" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
+              <img src="/gcoc.png" alt="⚡ Powered by Gordon College" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
               <div>
                 <p style={{ fontSize: '15px', fontWeight: '900', color: 'var(--tx-bright)', margin: 0, letterSpacing: '-0.02em' }}>Rentora</p>
                 <p style={{ fontSize: '10px', color: 'var(--g-bright)', margin: 0, fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Gordon College</p>
